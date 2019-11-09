@@ -40,13 +40,37 @@ const dbName = 'website.db'
  */
 router.get('/', async ctx => {
 	try {
-		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		const data = {}
-		if(ctx.query.msg) data.msg = ctx.query.msg
-		await ctx.render('index')
+		await ctx.redirect('login')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
+})
+
+/**
+ * The user registration page.
+ *
+ * @name Gallery Page
+ * @route {GET} /gallery
+ */
+router.get('/gallery', async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		const data = {}
+		if(ctx.query.msg) data.msg = ctx.query.msg
+		await ctx.render('gallery')
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+/**
+ * The script to process new user registrations.
+ *
+ * @name Gallery Script
+ * @route {POST} /gallery
+ */
+router.post('/gallery', koaBody, async ctx => {
+	//implement post
 })
 
 /**
@@ -92,7 +116,8 @@ router.post('/login', async ctx => {
 		const user = await new User(dbName)
 		await user.login(body.user, body.pass)
 		ctx.session.authorised = true
-		return ctx.redirect('/?msg=you are now logged in...')
+		return await ctx.redirect('gallery')
+		//return ctx.redirect('/?msg=you are now logged in...')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
@@ -102,6 +127,10 @@ router.get('/logout', async ctx => {
 	ctx.session.authorised = null
 	ctx.redirect('/?msg=you are now logged out')
 })
+
+
+
+
 
 app.use(router.routes())
 module.exports = app.listen(port, async() => console.log(`listening on port ${port}`))
