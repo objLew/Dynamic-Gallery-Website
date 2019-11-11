@@ -12,6 +12,10 @@ const staticDir = require('koa-static')
 const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
+
+const Database = require('sqlite-async')
+//const stat = require('koa-static')
+//const handlebars = require('koa-hbs-renderer')
 //const jimp = require('jimp')
 
 /* IMPORT CUSTOM MODULES */
@@ -55,9 +59,17 @@ router.get('/', async ctx => {
 router.get('/gallery', async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		const data = {}
-		if(ctx.query.msg) data.msg = ctx.query.msg
-		await ctx.render('gallery')
+		//const data = {}
+		//if(ctx.query.msg) data.msg = ctx.query.msg
+
+		console.log('/')
+		const sql = 'SELECT user FROM users;'
+		const db = await Database.open(dbName)
+		const data = await db.all(sql)
+		await db.close()
+		console.log(data)
+		await ctx.render('gallery', {user: data})
+
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
