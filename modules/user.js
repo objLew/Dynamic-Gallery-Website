@@ -14,7 +14,6 @@ module.exports = class User {
 			this.db = await sqlite.open(dbName)
 			// we need this table to store the user accounts
 			const sql = 'CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,  email TEXT, paypal TEXT, pass TEXT, profilePic BLOB);'
-			const sql = 'CREATE TABLE IF NOT EXISTS itemsOfInterest (userId INTEGER,  itemID INTEGER);'
 			await this.db.run(sql)
 			return this
 		})()
