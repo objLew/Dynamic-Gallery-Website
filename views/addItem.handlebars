@@ -1,0 +1,24 @@
+
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Create an Account</title>
+		<meta name="description" content="form to add new books">
+		<meta name="author" content="Mark Tyers">
+		<link href="style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<h1>Create an Account</h1>
+		<form action="/register" enctype="multipart/form-data" method="post">
+			<p>Item Name:<br /><input type="text" name="name" placeholder="your preferred username (no spaces)" value=""></p>
+            <p>Short description:<br /><input type="password" name="shortDesc" placeholder="your chosen password" value=""></p>
+            <p>Long description:<br /><input type="password" name="longDesc" placeholder="your chosen password" value=""></p>
+            <p>Price:<br /><input type="password" name="price" placeholder="your chosen password" value=""></p>
+			<p>Profile Picture:<br /><input type="file" name="avatar"></p>
+			<p><input type="submit" value="Create"></p>
+		</form>
+		<p><a href="/gallery">back to home</a></p>
+	</body>
+</html>
