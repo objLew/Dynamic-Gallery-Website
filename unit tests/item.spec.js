@@ -112,7 +112,7 @@ describe('markAsSold()', () => {
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
         //seller id and buyer id
-        const markSold = await newItem.markAsSold("sellerPayPal", "buyerPayPal", 1);
+        const markSold = await newItem.markAsSold(1, 2, 1);
 
 		expect(markSold).toBe(true)
 		done()

@@ -13,7 +13,7 @@ module.exports = class items {
 			// creating a table to store item information
             const sql = 'CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, title TEXT, price INTEGER, shortDesc TEXT, longDesc TEXT, sold BOOLEAN);'
 			const sql2 = 'CREATE TABLE IF NOT EXISTS usersOfInterest (itemID INTEGER, userID INTEGER);'
-			const sql3 = 'CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT,  sellerPayPal TEXT, buyerPayPal TEXT, itemID INTEGER);'
+			const sql3 = 'CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT,  sellerID INTEGER, buyerID INTEGER, itemID INTEGER);'
 
 			await this.db.run(sql)
 			await this.db.run(sql2)
@@ -40,9 +40,9 @@ module.exports = class items {
 		}
 	}
 	
-	async markAsSold(sellerPayPal, buyerPayPal, itemID){
+	async markAsSold(sellerID, buyerID, itemID){
 		//inserting transaction
-		let sql = `INSERT INTO transactions(sellerPayPal, buyerPayPal, itemID) VALUES("${sellerPayPal}", "${buyerPayPal}", "${itemID}")`
+		let sql = `INSERT INTO transactions(sellerID, buyerID, itemID) VALUES("${sellerID}", "${buyerID}", "${itemID}")`
 		await this.db.run(sql)
 
 		//updating item to be sold
