@@ -25,9 +25,9 @@ module.exports = class items {
 
 	async addItem(userID, title, price, shortDesc, longDesc){
 		try {
-			if(title.length === 0) throw new Error('missing title')
-			if(price === null) throw new Error('missing price')
-			if(shortDesc.length === 0) throw new Error('missing short description')
+			if(title === null || title.length === 0) throw new Error('missing title')
+			if(price == null || isNaN(price)) throw new Error('missing price')
+			if(shortDesc === null||shortDesc.length === 0) throw new Error('missing short description')
 			if(longDesc.length === 0) throw new Error('missing long description')
 			
 			//Inserting new item details - sold is set to false by default

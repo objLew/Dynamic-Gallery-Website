@@ -20,6 +20,7 @@ const Database = require('sqlite-async')
 
 /* IMPORT CUSTOM MODULES */
 const User = require('./modules/user')
+const Item = require('./modules/item')
 
 const app = new Koa()
 const router = new Router()
@@ -34,6 +35,8 @@ app.use(views(`${__dirname}/views`, { extension: 'handlebars' }, {map: { handleb
 const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 const dbName = 'website.db'
+
+let currentUserID = 1;
 
 /**
  * The secure home page.
@@ -125,9 +128,20 @@ router.get('/login', async ctx => {
 router.post('/login', async ctx => {
 	try {
 		const body = ctx.request.body
+		console.log(body)
 		const user = await new User(dbName)
 		await user.login(body.user, body.pass)
 		ctx.session.authorised = true
+		
+		
+		//Getting userID from username
+		const sql = `SELECT id FROM users WHERE user = "${body.user}"`
+		const db = await Database.open(dbName)
+		const data = await db.all(sql)
+		ctx.session.userID = data;
+
+		//console.log(currentUserID)
+
 		return await ctx.redirect('gallery')
 		//return ctx.redirect('/?msg=you are now logged in...')
 	} catch(err) {
@@ -140,7 +154,32 @@ router.get('/logout', async ctx => {
 	ctx.redirect('/?msg=you are now logged out')
 })
 
+router.get('/addItem', async ctx => {
+		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		await ctx.render('addItem')
+})
 
+router.post('/addItem', koaBody, async ctx => {
+	try {
+		// extract the data from the request
+		const body = ctx.request.body
+		console.log(body)
+		const item = await new Item(dbName);
+		console.log(item);
+
+		/*
+		if(body == undefined||Object.keys(body).length <= 0){
+			throw new Error('Whatcha doing');
+		}
+		*/
+		
+		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
+
+		await ctx.redirect('/gallery')	
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
 
 
 
