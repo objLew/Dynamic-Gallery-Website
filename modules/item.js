@@ -12,7 +12,7 @@ module.exports = class items {
 			this.db = await sqlite.open(dbName)
 			// creating a table to store item information
             const sql = 'CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, title TEXT, price INTEGER, shortDesc TEXT, longDesc TEXT, sold BOOLEAN);'
-			const sql2 = 'CREATE TABLE IF NOT EXISTS usersOfInterest (itemID INTEGER, userId INTEGER);'
+			const sql2 = 'CREATE TABLE IF NOT EXISTS usersOfInterest (itemID INTEGER, userID INTEGER);'
 			const sql3 = 'CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT,  sellerPayPal TEXT, buyerPayPal TEXT, itemID INTEGER);'
 
 			await this.db.run(sql)
@@ -51,4 +51,27 @@ module.exports = class items {
 
 		return true
 	}
+
+	async addInterestedUser(itemID, userID){
+		let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}";`
+		const data = await this.db.get(sql)
+		if(data.records !== 0) throw new Error(`user ${userID} already interested in this item`)
+
+		sql = `INSERT INTO usersOfInterest(itemID, userID) VALUES("${itemID}", "${userID}")`
+		await this.db.run(sql)
+
+		return true;
+	}
+
+	async removeInterestedUser(itemID, userID){
+		let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID ="${itemID}";`
+		const data = await this.db.get(sql)
+		if(data.records == 0) throw new Error(`user ${userID} NOT interested in this item`)
+
+		sql = `DELETE FROM usersOfInterest WHERE itemID = ${itemID} AND userID = ${userID}`
+		await this.db.run(sql)
+
+		return true;
+	}
+
 }

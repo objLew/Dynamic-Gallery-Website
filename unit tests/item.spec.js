@@ -120,7 +120,7 @@ describe('markAsSold()', () => {
 
 })
 
-describe('addIterestedUser()', () => {
+describe('addInterestedUser()', () => {
     test('adding an user interested in the item', async done => {
         expect.assertions(1)
 
@@ -128,7 +128,7 @@ describe('addIterestedUser()', () => {
         const newItem = await new Item()
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
-        const result = await newItem.addIterestedUser(1, 1);
+        const result = await newItem.addInterestedUser(1, 1);
 
         expect(result).toBe(true)
 		done()
@@ -141,10 +141,10 @@ describe('addIterestedUser()', () => {
         const newItem = await new Item()
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
-        await newItem.addIterestedUser(1, 1);
-        const result = await newItem.addIterestedUser(1, 1);
+        await newItem.addInterestedUser(1, 1);
 
-        expect(result).toBe(false)
+        await expect( newItem.addInterestedUser(1, 1) )
+			.rejects.toEqual( Error('user 1 already interested in this item') )
 		done()
     })
 })
@@ -158,7 +158,7 @@ describe('removeInterestedUser()', () => {
         const newItem = await new Item()
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
-        await newItem.addIterestedUser(1, 1);
+        await newItem.addInterestedUser(1, 1);
         const result = await newItem.removeInterestedUser(1,1);
 
         expect(result).toBe(true)
@@ -172,11 +172,11 @@ describe('removeInterestedUser()', () => {
         const newItem = await new Item()
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
-        //await newItem.addIterestedUser(1, 1);
-        const result = await newItem.removeInterestedUser(1,1);
+        //await newItem.addInterestedUser(1, 1);
 
-        expect(result).toBe(false)
-        done()
+        await expect( newItem.removeInterestedUser(1, 1) )
+			.rejects.toEqual( Error('user 1 NOT interested in this item') )
+		done()
     })
 })
 
