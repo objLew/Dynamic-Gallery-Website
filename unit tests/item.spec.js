@@ -100,21 +100,24 @@ describe('add item', () => {
 		done()
     })
     */
-   
+
 })
 
 describe('markSold()', () => {
-    test('mark item as sold', async done => {
+    test('buyer/seller succesfully saved to db', async done => {
         expect.assertions(1)
+
         //setup of item
         const newItem = await new Item()
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
-        const markSold = await newItem.markSold(1);
+        //seller id and buyer id
+        const markSold = await newItem.markSold("sellerPayPal", "buyerPayPal", 1);
 
 		expect(markSold).toBe(true)
 		done()
-	})
+    })
+
 })
 
 /*

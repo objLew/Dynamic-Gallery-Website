@@ -40,7 +40,15 @@ module.exports = class items {
 		}
 	}
 	
-	async markSold(itemID){
-		
+	async markSold(sellerPayPal, buyerPayPal, itemID){
+		//inserting transaction
+		let sql = `INSERT INTO transactions(sellerPayPal, buyerPayPal, itemID) VALUES("${sellerPayPal}", "${buyerPayPal}", "${itemID}")`
+		await this.db.run(sql)
+
+		//updating item to be sold
+		sql = 'UPDATE items SET sold = true WHERE id = ?', [itemID]
+		await this.db.run(sql)
+
+		return true
 	}
 }
