@@ -107,7 +107,7 @@ router.post('/register', koaBody, async ctx => {
 		// call the functions in the module
 		const user = await new User(dbName)
 		await user.register(body.user, body.pass)
-		await user.uploadPicture(path, type)
+		//await user.uploadPicture(path, type)
 		// redirect to the home page
 		ctx.redirect(`/?msg=new user "${body.name}" added`)
 	} catch(err) {

@@ -12,9 +12,11 @@ module.exports = class items {
 			this.db = await sqlite.open(dbName)
 			// creating a table to store item information
             const sql = 'CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, title TEXT, price INTEGER, shortDesc TEXT, longDesc TEXT, sold BOOLEAN);'
-			const sql = 'CREATE TABLE IF NOT EXISTS itemsOfInterest (itemID INTEGER, userId INTEGER);'
-			const sql = 'CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT,  sellerPayPal TEXT, buyerPayPal TEXT, itemID INTEGER);'
+			const sql2 = 'CREATE TABLE IF NOT EXISTS itemsOfInterest (itemID INTEGER, userId INTEGER);'
+			const sql3 = 'CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT,  sellerPayPal TEXT, buyerPayPal TEXT, itemID INTEGER);'
 			await this.db.run(sql)
+			await this.db.run(sql2)
+			await this.db.run(sql3)
 			return this
 		})()
 	}

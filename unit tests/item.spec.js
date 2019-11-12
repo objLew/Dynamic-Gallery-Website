@@ -1,7 +1,8 @@
 
 'use strict'
 
-const Accounts = require('../modules/item.js')
+const Accounts = require('../modules/user.js')
+const Item = require('../modules/item.js')
 
 
 describe('add item', () => {
@@ -10,11 +11,11 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        const register = await account.register('doej', 'password')
+        await account.register('doej', 'password')
         
         //setup of item
         const newItem = await new Item()
-        const addedItem = newItem.addItem("1", "monalisa", 1000, "nice", "very nice");
+        const addedItem = await newItem.addItem("1", "monalisa", 1000, "nice", "very nice");
 
 		expect(addedItem).toBe(true)
 		done()
@@ -24,11 +25,11 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        const register = await account.register('doej', 'password')
+        await account.register('doej', 'password')
         
         //setup of item
         const newItem = await new Item()
-        newItem.addItem("1", "monalisa", 1000, "nice", "very nice");
+        await newItem.addItem("1", "monalisa", 1000, "nice", "very nice");
         
         const sql = 'SELECT userID FROM items WHERE id = 1;'    //getting the user for first item
 		const db = await Database.open(dbName)
@@ -39,14 +40,24 @@ describe('add item', () => {
 		done()
     })
     
+
+})
+describe('markSold()', () => {
     test('mark item as sold', async done => {
         expect.assertions(1)
         //setup of item
         const newItem = await new Item()
-        newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
-        const markSold = newItem.markSold(1);
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        const markSold = await newItem.markSold(1);
+
 		expect(markSold).toBe(true)
 		done()
 	})
+})
+
+/*
+describe('markSold()', () => {
 
 })
+*/
