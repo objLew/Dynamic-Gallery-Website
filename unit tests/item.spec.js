@@ -103,7 +103,7 @@ describe('add item', () => {
 
 })
 
-describe('markSold()', () => {
+describe('markAsSold()', () => {
     test('buyer/seller succesfully saved to db', async done => {
         expect.assertions(1)
 
@@ -112,7 +112,7 @@ describe('markSold()', () => {
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
         //seller id and buyer id
-        const markSold = await newItem.markSold("sellerPayPal", "buyerPayPal", 1);
+        const markSold = await newItem.markAsSold("sellerPayPal", "buyerPayPal", 1);
 
 		expect(markSold).toBe(true)
 		done()
@@ -120,8 +120,69 @@ describe('markSold()', () => {
 
 })
 
+describe('addIterestedUser()', () => {
+    test('adding an user interested in the item', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        const result = await newItem.addIterestedUser(1, 1);
+
+        expect(result).toBe(true)
+		done()
+    })
+
+    test('adding duplicate users of interest', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        await newItem.addIterestedUser(1, 1);
+        const result = await newItem.addIterestedUser(1, 1);
+
+        expect(result).toBe(false)
+		done()
+    })
+})
+
+describe('removeInterestedUser()', () => {
+
+    test('removing an interested user', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        await newItem.addIterestedUser(1, 1);
+        const result = await newItem.removeInterestedUser(1,1);
+
+        expect(result).toBe(true)
+        done()
+    })
+
+    test('removing non existent user of interest', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        //await newItem.addIterestedUser(1, 1);
+        const result = await newItem.removeInterestedUser(1,1);
+
+        expect(result).toBe(false)
+        done()
+    })
+})
+
+
 /*
-describe('markSold()', () => {
+describe('markAsSold()', () => {
 
 })
 */

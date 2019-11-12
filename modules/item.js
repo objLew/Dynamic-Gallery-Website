@@ -12,7 +12,7 @@ module.exports = class items {
 			this.db = await sqlite.open(dbName)
 			// creating a table to store item information
             const sql = 'CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, title TEXT, price INTEGER, shortDesc TEXT, longDesc TEXT, sold BOOLEAN);'
-			const sql2 = 'CREATE TABLE IF NOT EXISTS itemsOfInterest (itemID INTEGER, userId INTEGER);'
+			const sql2 = 'CREATE TABLE IF NOT EXISTS usersOfInterest (itemID INTEGER, userId INTEGER);'
 			const sql3 = 'CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT,  sellerPayPal TEXT, buyerPayPal TEXT, itemID INTEGER);'
 
 			await this.db.run(sql)
@@ -40,7 +40,7 @@ module.exports = class items {
 		}
 	}
 	
-	async markSold(sellerPayPal, buyerPayPal, itemID){
+	async markAsSold(sellerPayPal, buyerPayPal, itemID){
 		//inserting transaction
 		let sql = `INSERT INTO transactions(sellerPayPal, buyerPayPal, itemID) VALUES("${sellerPayPal}", "${buyerPayPal}", "${itemID}")`
 		await this.db.run(sql)
