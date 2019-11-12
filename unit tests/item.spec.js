@@ -4,10 +4,12 @@
 const Accounts = require('../modules/user.js')
 const Item = require('../modules/item.js')
 
+const Database = require('sqlite-async')
+const dbName = 'website.db'
 
 describe('add item', () => {
 
-    test('user associated with item', async done => {
+    test('adding a new item', async done => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
@@ -21,6 +23,64 @@ describe('add item', () => {
 		done()
     })
 
+    test('missing title', async done => {
+        expect.assertions(1)
+        //setup account
+		const account = await new Accounts()
+        await account.register('doej', 'password')
+        
+        //setup of item
+        const newItem = await new Item()
+
+		await expect( newItem.addItem("1", "", 1000, "nice", "very nice") )
+			.rejects.toEqual( Error('missing title') )
+		done()
+    })
+
+    test('missing price', async done => {
+        expect.assertions(1)
+        //setup account
+		const account = await new Accounts()
+        await account.register('doej', 'password')
+        
+        //setup of item
+        const newItem = await new Item()
+
+		await expect( newItem.addItem("1", "monalisa", null, "nice", "very nice") )
+			.rejects.toEqual( Error('missing price') )
+		done()
+    })
+
+    test('missing short desc', async done => {
+        expect.assertions(1)
+        //setup account
+		const account = await new Accounts()
+        await account.register('doej', 'password')
+        
+        //setup of item
+        const newItem = await new Item()
+ 
+		await expect( newItem.addItem("1", "monalisa", 1000, "", "very nice") )
+			.rejects.toEqual( Error('missing short description') )
+		done()
+    })
+
+    test('missing long desc', async done => {
+        expect.assertions(1)
+        //setup account
+		const account = await new Accounts()
+        await account.register('doej', 'password')
+        
+        //setup of item
+        const newItem = await new Item()
+ 
+		await expect( newItem.addItem("1", "monalisa", 1000, "nice", "") )
+			.rejects.toEqual( Error('missing long description') )
+		done()
+    })
+
+
+    /*
     test('get userID associated with item', async done => {
         expect.assertions(1)
         //setup account
@@ -39,9 +99,10 @@ describe('add item', () => {
 		expect(data).toEqual(1)
 		done()
     })
-    
-
+    */
+   
 })
+
 describe('markSold()', () => {
     test('mark item as sold', async done => {
         expect.assertions(1)
