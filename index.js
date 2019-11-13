@@ -197,6 +197,27 @@ router.post('/addItem', koaBody, async ctx => {
 	}
 })
 
+router.get('/items/:index', async ctx => {
+	try {
+		console.log(ctx.params.index)
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		//const data = {}
+		//if(ctx.query.msg) data.msg = ctx.query.msg
+		console.log(ctx.session.userID)
+		console.log('/')
+
+		//Getting information on items from items DB
+		const sql = `SELECT * FROM items where id = "${ctx.params.index}"`
+		const db = await Database.open(dbName)
+		const data = await db.all(sql)
+		await db.close()
+
+		await ctx.render('gallery', {id: data})
+
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
 
 
 app.use(router.routes())
