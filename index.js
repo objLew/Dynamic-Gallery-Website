@@ -36,6 +36,8 @@ const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 const dbName = 'website.db'
 
+var fs = require('fs-extra');
+
 /**
  * The secure home page.
  *
@@ -107,8 +109,14 @@ router.post('/register', koaBody, async ctx => {
 		// extract the data from the request
 		const body = ctx.request.body
 		console.log(body)
+
+		const {path, type} = ctx.request.files.avatar
+
+		await fs.copy(path, `public/avatars/${body.user}.png`)
+
 		// call the functions in the module
 		const user = await new User(dbName)
+		
 		await user.register(body.user, body.pass)
 		//await user.uploadPicture(path, type)
 		// redirect to the home page
@@ -172,6 +180,11 @@ router.post('/addItem', koaBody, async ctx => {
 		// extract the data from the request
 		const body = ctx.request.body
 		console.log(body)
+
+		const {path, type} = ctx.request.files.avatar
+
+		await fs.copy(path, `public/items/${body.title}.png`)
+
 		const item = await new Item(dbName);
 		console.log(item);
 		console.log(ctx.session.userID)
