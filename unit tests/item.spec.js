@@ -17,9 +17,23 @@ describe('add item', () => {
         
         //setup of item
         const newItem = await new Item()
-        const addedItem = await newItem.addItem("1", "monalisa", 1000, "nice", "very nice");
+        const addedItem = await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
 		expect(addedItem).toBe(true)
+		done()
+    })
+    
+    test('missing userID', async done => {
+        expect.assertions(1)
+        //setup account
+		const account = await new Accounts()
+        await account.register('doej', 'password')
+        
+        //setup of item
+        const newItem = await new Item()
+
+		await expect( newItem.addItem(null, "", 1000, "nice", "very nice") )
+			.rejects.toEqual( Error('missing userID') )
 		done()
     })
 
@@ -32,7 +46,7 @@ describe('add item', () => {
         //setup of item
         const newItem = await new Item()
 
-		await expect( newItem.addItem("1", "", 1000, "nice", "very nice") )
+		await expect( newItem.addItem(1, "", 1000, "nice", "very nice") )
 			.rejects.toEqual( Error('missing title') )
 		done()
     })
@@ -46,7 +60,7 @@ describe('add item', () => {
         //setup of item
         const newItem = await new Item()
 
-		await expect( newItem.addItem("1", "monalisa", null, "nice", "very nice") )
+		await expect( newItem.addItem(1, "monalisa", null, "nice", "very nice") )
 			.rejects.toEqual( Error('missing price') )
 		done()
     })
@@ -60,7 +74,7 @@ describe('add item', () => {
         //setup of item
         const newItem = await new Item()
  
-		await expect( newItem.addItem("1", "monalisa", 1000, "", "very nice") )
+		await expect( newItem.addItem(1, "monalisa", 1000, "", "very nice") )
 			.rejects.toEqual( Error('missing short description') )
 		done()
     })
@@ -74,7 +88,7 @@ describe('add item', () => {
         //setup of item
         const newItem = await new Item()
  
-		await expect( newItem.addItem("1", "monalisa", 1000, "nice", "") )
+		await expect( newItem.addItem(1, "monalisa", 1000, "nice", "") )
 			.rejects.toEqual( Error('missing long description') )
 		done()
     })
@@ -89,7 +103,7 @@ describe('add item', () => {
         
         //setup of item
         const newItem = await new Item()
-        await newItem.addItem("1", "monalisa", 1000, "nice", "very nice");
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
         
         const sql = 'SELECT userID FROM items WHERE id = 1;'    //getting the user for first item
 		const db = await Database.open(dbName)

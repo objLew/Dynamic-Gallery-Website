@@ -25,6 +25,7 @@ module.exports = class items {
 
 	async addItem(userID, title, price, shortDesc, longDesc){
 		try {
+			if(userID == null || isNaN(userID)) throw new Error('missing userID')
 			if(title === null || title.length === 0) throw new Error('missing title')
 			if(price == null || isNaN(price)) throw new Error('missing price')
 			if(shortDesc === null||shortDesc.length === 0) throw new Error('missing short description')

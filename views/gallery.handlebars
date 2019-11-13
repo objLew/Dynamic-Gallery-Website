@@ -10,26 +10,26 @@
 	</head>
 	<body>
 		<h1>Gallery Page</h1>
+		<p><a href="/addItem">Add an Item</a></p>
 		<p><a href="/logout">log out</a></p>
 
-		{{#each user}}
+		<!--
+		{{#each title}}
 		<div class="gallery">
 				<img src="../avatars/avatar.png" alt="User Avatar" width="300" height="200">
-				<div class="desc">{{user}}</div>
-		</div>
-		{{/each}}
-
-		<!--
-		{{#each item}}
-		<div class="gallery">
-  			<a target="_blank" href="{{BLOB}}">
-				<img src={{BLOB}} alt="Cinque Terre" width="300" height="200">
-  			</a>
-  			<div class="desc">{{SHORTDESCRIPTION}}</div>
-			  <div class="desc">{{PRICE}}</div>
+				<div class="desc">{{title}}</div>
 		</div>
 		{{/each}}
 		-->
-		<p><a href="/addItem">Add an Item</a></p>
+
+		{{#each id}}
+		<div class="gallery">
+			<img src='../avatars/avatar.png' alt="Cinque Terre" width="300" height="200">
+			<div class="title">{{this.title}}</div>
+			<div class="price">£{{this.price}}</div>
+		</div>
+		{{/each}}
+
+		
 	</body>
 </html>

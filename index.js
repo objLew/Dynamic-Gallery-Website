@@ -36,8 +36,6 @@ const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 const dbName = 'website.db'
 
-let currentUserID = 1;
-
 /**
  * The secure home page.
  *
@@ -64,14 +62,16 @@ router.get('/gallery', async ctx => {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 		//const data = {}
 		//if(ctx.query.msg) data.msg = ctx.query.msg
-
+		console.log(ctx.session.userID)
 		console.log('/')
-		const sql = 'SELECT user FROM users;'
+
+		//Getting information on items from items DB
+		const sql = 'SELECT * FROM items;'
 		const db = await Database.open(dbName)
 		const data = await db.all(sql)
 		await db.close()
-		console.log(data)
-		await ctx.render('gallery', {user: data})
+
+		await ctx.render('gallery', {id: data})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -138,25 +138,33 @@ router.post('/login', async ctx => {
 		const sql = `SELECT id FROM users WHERE user = "${body.user}"`
 		const db = await Database.open(dbName)
 		const data = await db.all(sql)
-		ctx.session.userID = data;
-
-		//console.log(currentUserID)
+		/*
+		console.log(data[0].id);
+		if(isNaN(data[0].id)) throw new Error("DATA IS NOT A FKIN NUMBER")
+		*/
+		console.log(data)
+		console.log(ctx.session.userID)
+		ctx.session.userID = data[0].id;
 
 		return await ctx.redirect('gallery')
-		//return ctx.redirect('/?msg=you are now logged in...')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
+
+
 
 router.get('/logout', async ctx => {
 	ctx.session.authorised = null
 	ctx.redirect('/?msg=you are now logged out')
 })
 
+
+
 router.get('/addItem', async ctx => {
 		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 		await ctx.render('addItem')
+		console.log(ctx.session.userID)
 })
 
 router.post('/addItem', koaBody, async ctx => {
@@ -166,13 +174,8 @@ router.post('/addItem', koaBody, async ctx => {
 		console.log(body)
 		const item = await new Item(dbName);
 		console.log(item);
+		console.log(ctx.session.userID)
 
-		/*
-		if(body == undefined||Object.keys(body).length <= 0){
-			throw new Error('Whatcha doing');
-		}
-		*/
-		
 		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
 		await ctx.redirect('/gallery')	

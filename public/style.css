@@ -26,7 +26,10 @@ body {
     height: auto;
   }
   
-  .desc {
-    padding: 15px;
+  .title {
+
     text-align: center;
+  }
+  .price {
+    text-align: right;
   }
