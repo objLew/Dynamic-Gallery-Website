@@ -61,7 +61,6 @@ describe('register()', () => {
 	})
 
 })
-
 /*
 describe('uploadPicture()', () => {
 	// this would have to be done by mocking the file system
