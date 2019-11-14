@@ -13,7 +13,7 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        await account.register('doej', 'password')
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
         
         //setup of item
         const newItem = await new Item()
@@ -27,7 +27,7 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        await account.register('doej', 'password')
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
         
         //setup of item
         const newItem = await new Item()
@@ -41,7 +41,7 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        await account.register('doej', 'password')
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
         
         //setup of item
         const newItem = await new Item()
@@ -55,7 +55,7 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        await account.register('doej', 'password')
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
         
         //setup of item
         const newItem = await new Item()
@@ -69,7 +69,7 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        await account.register('doej', 'password')
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
         
         //setup of item
         const newItem = await new Item()
@@ -83,7 +83,7 @@ describe('add item', () => {
         expect.assertions(1)
         //setup account
 		const account = await new Accounts()
-        await account.register('doej', 'password')
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
         
         //setup of item
         const newItem = await new Item()

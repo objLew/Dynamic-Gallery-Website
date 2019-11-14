@@ -19,10 +19,13 @@ module.exports = class User {
 		})()
 	}
 
-	async register(user, pass) {
+	async register(user, email, paypal, pass) {
 		try {
 			if(user.length === 0) throw new Error('missing username')
+			if(paypal.length === 0) throw new Error('missing paypal')
+			if(email.length === 0) throw new Error('missing email')
 			if(pass.length === 0) throw new Error('missing password')
+
 			let sql = `SELECT COUNT(id) as records FROM users WHERE user="${user}";`
 			const data = await this.db.get(sql)
 			if(data.records !== 0) throw new Error(`username "${user}" already in use`)
