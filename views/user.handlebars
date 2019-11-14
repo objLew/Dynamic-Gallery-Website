@@ -3,13 +3,13 @@
 <html lang="en">
     <head >
 		<meta charset="utf-8">
-		<title>{{this.title}}</title>
+		<title>User Page</title>
 		<meta name="description" content="Homepage for the Gallery">
 		<meta name="author" content="Lewis Lovette">
 		<link href="style.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
-		<h1>{{this.title}}</h1>
+		<h1>User Page</h1>
 		<p><a href="/addItem">Add an Item</a></p>
 		<p><a href="/logout">log out</a></p>
 
@@ -21,19 +21,15 @@
 		</div>
 		{{/each}}
 		-->
-		{{#each user}}
-		<a href="/user/{{this.id}}">
-			<img src='../avatars/{{this.user}}.png' alt="{{this.user}}" width="300" height="200">
-			<div class="name">{{this.user}}</div>
-		</a>
-		{{/each}}
 
 		{{#each id}}
-			<img src='../items/{{this.title}}.png' alt="{{this.title}}" width="300" height="200">
-			<div class="title">{{this.title}}</div>
-			<div class="price">£{{this.price}}</div>
-			<div class="shortDesc">{{this.shortDesc}}</div>
-			<div class="longDesc">{{this.longDesc}}</div>
+		<a href="/items/{{this.id}}">
+			<div class="gallery" >
+				<img src='../items/{{this.title}}.png' alt="Cinque Terre" width="300" height="200">
+				<div class="title">{{this.title}}</div>
+				<div class="price">£{{this.price}}</div>
+			</div>
+		</a>
 		{{/each}}
 
 		

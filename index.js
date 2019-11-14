@@ -203,22 +203,69 @@ router.get('/items/:index', async ctx => {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 		//const data = {}
 		//if(ctx.query.msg) data.msg = ctx.query.msg
-		console.log(ctx.session.userID)
-		console.log('/')
+		//console.log(ctx.session.userID)
 
 		//Getting information on items from items DB
-		const sql = `SELECT * FROM items where id = "${ctx.params.index}"`
+		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
+		const sqlUser = `SELECT * FROM users where id = "${ctx.session.userID}"`
 		const db = await Database.open(dbName)
-		const data = await db.all(sql)
+		const itemData = await db.all(sqlItems)
+		const userData = await db.all(sqlUser)
 		await db.close()
 
-		await ctx.render('gallery', {id: data})
+		await ctx.render('items', {id: itemData, user: userData})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
 
+/*
+router.post('/addItem', koaBody, async ctx => {
+	try {
+		// extract the data from the request
+		const body = ctx.request.body
+		console.log(body)
+
+		const {path, type} = ctx.request.files.avatar
+
+		await fs.copy(path, `public/items/${body.title}.png`)
+
+		const item = await new Item(dbName);
+		console.log(item);
+		console.log(ctx.session.userID)
+
+		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
+
+		await ctx.redirect('/gallery')	
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+*/
+
+router.get('/user/:index', async ctx => {
+	try {
+		console.log(ctx.params.index)
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		//const data = {}
+		//if(ctx.query.msg) data.msg = ctx.query.msg
+		//console.log(ctx.session.userID)
+
+		//Getting information on items from items DB
+		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
+		const sqlUser = `SELECT * FROM users where id = "${ctx.session.userID}"`
+		const db = await Database.open(dbName)
+		const itemData = await db.all(sqlItems)
+		const userData = await db.all(sqlUser)
+		await db.close()
+
+		await ctx.render('items', {id: itemData}, {user: userData})
+
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
 
 app.use(router.routes())
 module.exports = app.listen(port, async() => console.log(`listening on port ${port}`))
