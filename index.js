@@ -220,10 +220,6 @@ router.get('/items/:index', async ctx => {
 	try {
 		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		//const data = {}
-		//if(ctx.query.msg) data.msg = ctx.query.msg
-		//console.log(ctx.session.userID)
-
 		//Getting information on items from items DB
 		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
 		const db = await Database.open(dbName)
