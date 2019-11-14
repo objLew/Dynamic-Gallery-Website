@@ -131,6 +131,14 @@ router.get('/login', async ctx => {
 	await ctx.render('login', data)
 })
 
+
+/**
+ * The script to process user logins.
+ *
+ * @name Login Script
+ * @route {POST} /login
+ */
+
 router.post('/login', async ctx => {
 	try {
 		const body = ctx.request.body
@@ -173,6 +181,13 @@ router.get('/addItem', async ctx => {
 		console.log(ctx.session.userID)
 })
 
+/**
+ * The script to process new items added.
+ *
+ * @name addItem Script
+ * @route {POST} /addItem
+ */
+
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
@@ -194,6 +209,13 @@ router.post('/addItem', koaBody, async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
+
+/**
+ * The script to process the currently clicked ite.
+ *
+ * @name items Script
+ * @route {POST} /items
+ */
 
 router.get('/items/:index', async ctx => {
 	try {
