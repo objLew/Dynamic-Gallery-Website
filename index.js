@@ -131,6 +131,14 @@ router.get('/login', async ctx => {
 	await ctx.render('login', data)
 })
 
+
+/**
+ * The script to process user logins.
+ *
+ * @name Login Script
+ * @route {POST} /login
+ */
+
 router.post('/login', async ctx => {
 	try {
 		const body = ctx.request.body
@@ -173,6 +181,13 @@ router.get('/addItem', async ctx => {
 		console.log(ctx.session.userID)
 })
 
+/**
+ * The script to process new items added.
+ *
+ * @name addItem Script
+ * @route {POST} /addItem
+ */
+
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
@@ -195,6 +210,12 @@ router.post('/addItem', koaBody, async ctx => {
 	}
 })
 
+/**
+ * The script to process the currently clicked ite.
+ *
+ * @name items Script
+ * @route {POST} /items
+ */
 router.get('/items/:index', async ctx => {
 	try {
 		console.log(ctx.params.index)
@@ -221,30 +242,6 @@ router.get('/items/:index', async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
-
-/*
-router.post('/addItem', koaBody, async ctx => {
-	try {
-		// extract the data from the request
-		const body = ctx.request.body
-		console.log(body)
-
-		const {path, type} = ctx.request.files.avatar
-
-		await fs.copy(path, `public/items/${body.title}.png`)
-
-		const item = await new Item(dbName);
-		console.log(item);
-		console.log(ctx.session.userID)
-
-		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
-
-		await ctx.redirect('/gallery')	
-	} catch(err) {
-		await ctx.render('error', {message: err.message})
-	}
-})
-*/
 
 router.get('/user/:index', async ctx => {
 	try {
