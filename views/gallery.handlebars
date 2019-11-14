@@ -6,21 +6,12 @@
 		<title>Gallery Page</title>
 		<meta name="description" content="Homepage for the Gallery">
 		<meta name="author" content="Lewis Lovette">
-		<link href="style.css" type="text/css" rel="stylesheet" />
+		<link href="../style.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
 		<h1>Gallery Page</h1>
 		<p><a href="/addItem">Add an Item</a></p>
 		<p><a href="/logout">log out</a></p>
-
-		<!--
-		{{#each title}}
-		<div class="gallery">
-				<img src="../avatars/avatar.png" alt="User Avatar" width="300" height="200">
-				<div class="desc">{{title}}</div>
-		</div>
-		{{/each}}
-		-->
 
 		{{#each id}}
 		<a href="/items/{{this.id}}">

@@ -22,9 +22,10 @@
 		{{/each}}
 		-->
 		{{#each user}}
-		<a href="/user/{{this.id}}">
-			<img src='../avatars/{{this.user}}.png' alt="{{this.user}}" width="300" height="200">
-			<div class="name">{{this.user}}</div>
+		<a href="/user/{{this.id}}" >
+			<img src='../avatars/{{this.user}}.png' alt="{{this.user}}" width="75" height="50">
+			<div class="name">Username: {{this.user}}</div>
+			<div class="title" style="padding-bottom: 40px">Email: {{this.email}}</div>
 		</a>
 		{{/each}}
 
@@ -32,8 +33,8 @@
 			<img src='../items/{{this.title}}.png' alt="{{this.title}}" width="300" height="200">
 			<div class="title">{{this.title}}</div>
 			<div class="price">£{{this.price}}</div>
-			<div class="shortDesc">{{this.shortDesc}}</div>
-			<div class="longDesc">{{this.longDesc}}</div>
+			<div class="shortDesc">Short description: {{this.shortDesc}}</div>
+			<div class="longDesc">Long description: {{this.longDesc}}</div>
 		{{/each}}
 
 		

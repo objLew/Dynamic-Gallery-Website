@@ -3,33 +3,33 @@ body {
     font-family: Arial, Helvetica, sans-serif;
   }
   
-  .msg {
-    border: 1px solid red;
-    font-weight: bold;
-    color: red;
-    padding: 1em;
-  }
-  
-  .gallery {
-    margin: 5px;
-    border: 1px solid #ccc;
-    float: left;
-    width: 180px;
-  }
-  
-  .gallery:hover {
-    border: 1px solid #777;
-  }
-  
-  .gallery img {
-    width: 100%;
-    height: auto;
-  }
-  
-  .title {
+.msg {
+  border: 1px solid red;
+  font-weight: bold;
+  color: red;
+  padding: 1em;
+}
 
-    text-align: center;
-  }
-  .price {
-    text-align: right;
-  }
+.gallery {
+  margin: 5px;
+  border: 1px solid #ccc;
+  float: left;
+  width: 180px;
+}
+
+.gallery:hover {
+  border: 1px solid #777;
+}
+
+.gallery img {
+  width: 100%;
+  height: auto;
+}
+
+.title {
+
+  text-align: center;
+}
+.price {
+  text-align: right;
+}

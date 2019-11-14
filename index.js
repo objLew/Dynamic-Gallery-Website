@@ -36,7 +36,7 @@ const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 const dbName = 'website.db'
 
-var fs = require('fs-extra');
+const fs = require('fs-extra');
 
 /**
  * The secure home page.
@@ -62,11 +62,9 @@ router.get('/', async ctx => {
 router.get('/gallery', async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		//const data = {}
-		//if(ctx.query.msg) data.msg = ctx.query.msg
-		console.log(ctx.session.userID)
-		console.log('/')
-
+		//item class so that 'create table if not exist' is able to run.
+		const item = new Item(dbName)
+		
 		//Getting information on items from items DB
 		const sql = 'SELECT * FROM items;'
 		const db = await Database.open(dbName)
@@ -117,7 +115,7 @@ router.post('/register', koaBody, async ctx => {
 		// call the functions in the module
 		const user = await new User(dbName)
 		
-		await user.register(body.user, body.pass)
+		await user.register(body.user, body.email, body.paypal, body.pass)
 		//await user.uploadPicture(path, type)
 		// redirect to the home page
 		ctx.redirect(`/?msg=new user "${body.name}" added`)
@@ -207,9 +205,13 @@ router.get('/items/:index', async ctx => {
 
 		//Getting information on items from items DB
 		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
-		const sqlUser = `SELECT * FROM users where id = "${ctx.session.userID}"`
 		const db = await Database.open(dbName)
 		const itemData = await db.all(sqlItems)
+
+		const userID = itemData[0].userID
+		console.log(userID)
+		const sqlUser = `SELECT * FROM users where id = "${userID}"`
+
 		const userData = await db.all(sqlUser)
 		await db.close()
 
@@ -248,19 +250,15 @@ router.get('/user/:index', async ctx => {
 	try {
 		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		//const data = {}
-		//if(ctx.query.msg) data.msg = ctx.query.msg
-		//console.log(ctx.session.userID)
-
-		//Getting information on items from items DB
-		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
-		const sqlUser = `SELECT * FROM users where id = "${ctx.session.userID}"`
+		//Getting information on specified user from items DB
+		const sqlUser = `SELECT * FROM users where id = "${ctx.params.index}"`
+		const sqlItems = `SELECT * FROM items where userID = "${ctx.params.index}"`
 		const db = await Database.open(dbName)
-		const itemData = await db.all(sqlItems)
 		const userData = await db.all(sqlUser)
+		const userItem = await db.all(sqlItems)
 		await db.close()
 
-		await ctx.render('items', {id: itemData}, {user: userData})
+		await ctx.render('user', {user: userData, item: userItem})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})

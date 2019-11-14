@@ -1,28 +1,28 @@
 <!doctype html>
 
 <html lang="en">
+    
     <head >
+        {{#each user}}
 		<meta charset="utf-8">
-		<title>User Page</title>
-		<meta name="description" content="Homepage for the Gallery">
+		<title>{{this.user}}s Page</title>
+		<meta name="description" content="Homepage for this user">
 		<meta name="author" content="Lewis Lovette">
-		<link href="style.css" type="text/css" rel="stylesheet" />
+		<link href="../style.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
-		<h1>User Page</h1>
-		<p><a href="/addItem">Add an Item</a></p>
+		<h1>{{this.user}}s Page</h1>
 		<p><a href="/logout">log out</a></p>
 
-		<!--
-		{{#each title}}
-		<div class="gallery">
-				<img src="../avatars/avatar.png" alt="User Avatar" width="300" height="200">
-				<div class="desc">{{title}}</div>
-		</div>
-		{{/each}}
-		-->
+        <div class="user" >
+            <img src='../avatars/{{this.user}}.png' alt="Cinque Terre" width="300" height="200">
+            <div class="title">Name: {{this.user}}</div>
+            <div class="title">Email: {{this.email}}</div>
+            <div class="title">{{this.user}}</div>
+        </div>
+        {{/each}}
 
-		{{#each id}}
+        {{#each item}}
 		<a href="/items/{{this.id}}">
 			<div class="gallery" >
 				<img src='../items/{{this.title}}.png' alt="Cinque Terre" width="300" height="200">
@@ -31,7 +31,7 @@
 			</div>
 		</a>
 		{{/each}}
-
-		
+        
 	</body>
+    
 </html>

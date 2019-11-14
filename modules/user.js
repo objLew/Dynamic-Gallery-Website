@@ -30,7 +30,7 @@ module.exports = class User {
 			const data = await this.db.get(sql)
 			if(data.records !== 0) throw new Error(`username "${user}" already in use`)
 			pass = await bcrypt.hash(pass, saltRounds)
-			sql = `INSERT INTO users(user, pass) VALUES("${user}", "${pass}")`
+			sql = `INSERT INTO users(user, email, paypal, pass) VALUES("${user}", "${email}", "${paypal}", "${pass}")`
 			await this.db.run(sql)
 			return true
 		} catch(err) {
