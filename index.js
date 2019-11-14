@@ -138,7 +138,6 @@ router.get('/logout', async ctx => {
 
 
 
-<<<<<<< HEAD
 router.get('/addItem', async ctx => {
 		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 		await ctx.render('addItem')
@@ -225,9 +224,6 @@ router.get('/user/:index', async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
-=======
-
->>>>>>> 85974e13d5d2ecd7f17a1dae308059c2bfdfeac0
 
 app.use(router.routes())
 module.exports = app.listen(port, async() => console.log(`listening on port ${port}`))
