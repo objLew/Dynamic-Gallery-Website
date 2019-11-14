@@ -1,0 +1,24 @@
+
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Add an item</title>
+		<meta name="description" content="form to add new item">
+		<meta name="author" content="Lewis Lovette">
+		<link href="style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<h1>Create an Account</h1>
+		<form action="/addItem" enctype="multipart/form-data" method="post">
+			<p>Item Title:<br /><input type="text" name="title" placeholder="title for your item" value=""></p>
+            <p>Price:<br /><input type="number" step="1" name="price" placeholder="your desired price" value=""></p>
+            <p>Short description:<br /><input type="text" name="shortDesc" placeholder="short description of your item" value=""></p>
+            <p>Long description:<br /><input type="text" name="longDesc" placeholder="detailed description of your item" value=""></p>
+			<p>Item Picture:<br /><input type="file" name="avatar"></p>
+			<p><input type="submit" value="Create"></p>
+		</form>
+		<p><a href="/gallery">back to home</a></p>
+	</body>
+</html>
