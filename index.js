@@ -242,7 +242,14 @@ router.get('/items/:index', async ctx => {
 		const userData = await db.all(sqlUser)
 		await db.close()
 
-		await ctx.render('items', {id: itemData, user: userData})
+		//checking how many pictures the item has
+		const images = [];
+		if(fs.existsSync(`public/items/${itemData[0].title}1.png`)) images.push(itemData[0].title+"1")
+		if(fs.existsSync(`public/items/${itemData[0].title}2.png`)) images.push(itemData[0].title+"2")
+		if(fs.existsSync(`public/items/${itemData[0].title}3.png`)) images.push(itemData[0].title+"3")
+	
+		
+		await ctx.render('items', {image: images, id: itemData, user: userData})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})

@@ -27,10 +27,12 @@
 		</a>
 		{{/each}}
 
+		{{#each image}}
+			<img src='../items/{{this}}.png' alt="{{this.title}}" width="300" height="200">
+		{{/each}}
+
 		{{#each id}}
-			<img src='../items/{{this.title}}1.png' alt="{{this.title}}" width="300" height="200">
-			<img src='../items/{{this.title}}2.png' alt="{{this.title}}" width="300" height="200">
-			<img src='../items/{{this.title}}3.png' alt="{{this.title}}" width="300" height="200">
+			
 			<div class="title">{{this.title}}</div>
 			<div class="price">£{{this.price}}</div>
 			<div class="shortDesc">Short description: {{this.shortDesc}}</div>
