@@ -194,9 +194,19 @@ router.post('/addItem', koaBody, async ctx => {
 		const body = ctx.request.body
 		console.log(body)
 
-		const {path, type} = ctx.request.files.avatar
 
-		await fs.copy(path, `public/items/${body.title}.png`)
+		var {path, type} = ctx.request.files.pic1
+		console.log(path)
+		await fs.copy(path, `public/items/${body.title}1.png`)
+
+		var {path, type} = ctx.request.files.pic2
+		console.log(path)
+		await fs.copy(path, `public/items/${body.title}2.png`)
+
+		var {path, type} = ctx.request.files.pic3
+		console.log(path)
+		await fs.copy(path, `public/items/${body.title}3.png`)
+
 
 		const item = await new Item(dbName);
 		console.log(item);
@@ -239,6 +249,15 @@ router.get('/items/:index', async ctx => {
 	}
 })
 
+router.post('/items/:index', koaBody, async ctx => {
+	try {
+		
+		console.log("user of interest added!")	
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
 router.get('/user/:index', async ctx => {
 	try {
 		console.log(ctx.params.index)
@@ -257,6 +276,8 @@ router.get('/user/:index', async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
+
+
 //setting up release
 app.use(router.routes())
 module.exports = app.listen(port, async() => console.log(`listening on port ${port}`))

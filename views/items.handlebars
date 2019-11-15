@@ -7,19 +7,17 @@
 		<meta name="description" content="Homepage for the Gallery">
 		<meta name="author" content="Lewis Lovette">
 		<link href="style.css" type="text/css" rel="stylesheet" />
+
+
 	</head>
 	<body>
 		<h1>{{this.title}}</h1>
 		<p><a href="/addItem">Add an Item</a></p>
 		<p><a href="/logout">log out</a></p>
-
 		<!--
-		{{#each title}}
-		<div class="gallery">
-				<img src="../avatars/avatar.png" alt="User Avatar" width="300" height="200">
-				<div class="desc">{{title}}</div>
-		</div>
-		{{/each}}
+		<form action="/register" enctype="multipart/form-data" method="post">
+			<p><input type="submit" value="Create"></p>
+		</form>
 		-->
 		{{#each user}}
 		<a href="/user/{{this.id}}" >
@@ -30,7 +28,9 @@
 		{{/each}}
 
 		{{#each id}}
-			<img src='../items/{{this.title}}.png' alt="{{this.title}}" width="300" height="200">
+			<img src='../items/{{this.title}}1.png' alt="{{this.title}}" width="300" height="200">
+			<img src='../items/{{this.title}}2.png' alt="{{this.title}}" width="300" height="200">
+			<img src='../items/{{this.title}}3.png' alt="{{this.title}}" width="300" height="200">
 			<div class="title">{{this.title}}</div>
 			<div class="price">£{{this.price}}</div>
 			<div class="shortDesc">Short description: {{this.shortDesc}}</div>
