@@ -125,5 +125,17 @@ module.exports = class items {
 			throw err
 		}
 	}
+
+	async numberOfInterested(itemID){
+		try{
+			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
+			let sql = `SELECT COUNT(${itemID}) as records FROM usersOfInterest`
+			const data = await this.db.get(sql)
+			
+			return data.records
+		} catch(err) {
+			throw err
+		}
+	}
 	
 }

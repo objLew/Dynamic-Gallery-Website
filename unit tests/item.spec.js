@@ -228,7 +228,51 @@ describe('isInterested()', () => {
     })
 })
 
+describe('numberOfInterested()', () => {
+    test('1 interested user', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        await newItem.addInterestedUser(1, 1);
+
+        const result = await newItem.numberOfInterested(1);
+
+        expect(result).toBe(1)
+		done()
+    })
+
+    test('no interested users', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        const result = await newItem.numberOfInterested(1, 1);
+
+        expect(result).toBe(0)
+		done()
+    })
+
+    test('invalid userID', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        await expect( newItem.numberOfInterested(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+    })
+
+})
+
 describe('addInterestedUser()', () => {
+
     test('adding an user interested in the item', async done => {
         expect.assertions(1)
 
