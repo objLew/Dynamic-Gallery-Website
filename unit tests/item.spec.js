@@ -174,6 +174,60 @@ describe('markAsSold()', () => {
 
 })
 
+describe('isInterested()', () => {
+    test('user is already interested', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        await newItem.addInterestedUser(1, 1);
+
+        const result = await newItem.isInterested(1, 1);
+
+        expect(result).toBe(true)
+		done()
+    })
+
+    test('user is not currently interested', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        const result = await newItem.isInterested(1, 1);
+
+        expect(result).toBe(false)
+		done()
+    })
+
+    test('invalid userID', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        await expect( newItem.isInterested(1, null) )
+			.rejects.toEqual( Error('missing userID') )
+		done()
+    })
+
+    test('invalid itemID', async done => {
+        expect.assertions(1)
+
+        //setup of item
+        const newItem = await new Item()
+        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+
+        await expect( newItem.isInterested(null, 1) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+    })
+})
+
 describe('addInterestedUser()', () => {
     test('adding an user interested in the item', async done => {
         expect.assertions(1)
@@ -283,9 +337,3 @@ describe('removeInterestedUser()', () => {
     
 })
 
-
-/*
-describe('markAsSold()', () => {
-
-})
-*/

@@ -277,7 +277,9 @@ router.get('/items/:index/unterested', async ctx => {
 		await item.removeInterestedUser(ctx.params.index, ctx.session.userID);
 
 		console.log(ctx.params.index)
-		console.log("User interested")
+		console.log("User not interested anymore")
+
+		await ctx.redirect(`/items/${ctx.params.index}`)
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}

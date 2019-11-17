@@ -18,7 +18,12 @@
 
 		{{#each id}}
 		<form action="/items/{{this.id}}/interested">
-			<button type="submit" value="showInterest">test button</button>
+			<button type="submit" value="showInterest">show interest</button>
+		</form>
+		{{/each}}
+		{{#each id}}
+		<form action="/items/{{this.id}}/unterested">
+			<button type="submit" value="showInterest">remove interest</button>
 		</form>
 		{{/each}}
 

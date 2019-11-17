@@ -64,6 +64,28 @@ module.exports = class items {
 		}
 	}
 
+	//returns true if the user is interested in an item, false if not currently interested
+	async isInterested(itemID, userID){
+		try{
+
+			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
+			if(userID === null || isNaN(userID)) throw new Error('missing userID')
+
+			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}";`
+			const data = await this.db.get(sql)
+
+			if(data.records !== 0){
+				return true;
+			}
+			else{
+				return false;
+			}
+
+		} catch(err) {
+			throw err
+		}
+	}
+
 	async addInterestedUser(itemID, userID){
 		try {
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
