@@ -71,8 +71,12 @@ module.exports = class items {
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
 			if(userID === null || isNaN(userID)) throw new Error('missing userID')
 
-			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}";`
+			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}" AND userID="${userID}";`
 			const data = await this.db.get(sql)
+			
+			console.log("item " + itemID)
+			console.log("user " + userID)
+			console.log(data)
 
 			if(data.records !== 0){
 				return true;
@@ -93,7 +97,7 @@ module.exports = class items {
 			
 			//TODO - check if user exists
 
-			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}";`
+			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}" AND userID="${userID}";`
 			const data = await this.db.get(sql)
 			if(data.records !== 0) throw new Error(`user ${userID} already interested in this item`)
 
@@ -113,7 +117,7 @@ module.exports = class items {
 
 			//TODO - check if user exists
 
-			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID ="${itemID}";`
+			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}" AND userID="${userID}";`
 			const data = await this.db.get(sql)
 			if(data.records == 0) throw new Error(`user ${userID} NOT interested in this item`)
 

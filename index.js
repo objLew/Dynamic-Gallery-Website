@@ -61,17 +61,18 @@ router.get('/', async ctx => {
  */
 router.get('/gallery', async ctx => {
 	try {
-		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 		//item class so that 'create table if not exist' is able to run.
-		const item = new Item(dbName)
+		//const item = new Item(dbName)
 		
 		//Getting information on items from items DB
 		const sql = 'SELECT * FROM items;'
 		const db = await Database.open(dbName)
 		const data = await db.all(sql)
 		await db.close()
-
-		await ctx.render('gallery', {id: data})
+		
+		const auth = ctx.session.authorised
+		await ctx.render('gallery', {id: data, auth: auth})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -272,7 +273,8 @@ router.get('/items/:index/interested', async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
-router.get('/items/:index/unterested', async ctx => {
+
+router.get('/items/:index/uninterested', async ctx => {
 	try{
 		const item = await new Item(dbName);
 
@@ -301,6 +303,18 @@ router.get('/user/:index', async ctx => {
 
 		await ctx.render('user', {user: userData, item: userItem})
 
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+router.get('/delete', async ctx => {
+	try{	
+
+		const sql = `DROP TABLE usersOfInterest`
+		const db = await Database.open(dbName)
+		await db.run(sql)
+		
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}

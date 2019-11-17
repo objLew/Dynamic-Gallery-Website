@@ -11,17 +11,37 @@
 	<body>
 		<h1>Gallery Page</h1>
 		<p><a href="/addItem">Add an Item</a></p>
-		<p><a href="/logout">log out</a></p>
+		{{#if auth}}
+			<p><a href="/logout">log out</a></p>
+		{{/if}}
+		{{#unless auth}}
+			<p><a href="/login">log in</a></p>
+		{{/unless}}
 
-		{{#each id}}
-		<a href="/items/{{this.id}}">
-			<div class="gallery" >
-				<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
-				<div class="title">{{this.title}}</div>
-				<div class="price">£{{this.price}}</div>
-			</div>
-		</a>
-		{{/each}}
+		
+		<!--if authorised user, let them click on items-->
+		{{#if auth}}
+			{{#each id}}
+				<a href="/items/{{this.id}}">
+					<div class="gallery" >
+						<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
+						<div class="title">{{this.title}}</div>
+						<div class="price">£{{this.price}}</div>
+					</div>
+				</a>
+			{{/each}}
+		{{/if}}
+		{{#unless auth}}
+			{{#each id}}
+				<div class="gallery" >
+					<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
+					<div class="title">{{this.title}}</div>
+					<div class="price">£{{this.price}}</div>
+				</div>
+			{{/each}}
+		{{/unless}}
+
+		
 
 	</body>
 </html>
