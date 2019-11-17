@@ -43,37 +43,49 @@ module.exports = class items {
 	}
 	
 	async markAsSold(sellerID, buyerID, itemID){
-		//inserting transaction
-		let sql = `INSERT INTO transactions(sellerID, buyerID, itemID) VALUES("${sellerID}", "${buyerID}", "${itemID}")`
-		await this.db.run(sql)
+		try {
+			//inserting transaction
+			let sql = `INSERT INTO transactions(sellerID, buyerID, itemID) VALUES("${sellerID}", "${buyerID}", "${itemID}")`
+			await this.db.run(sql)
 
-		//updating item to be sold
-		sql = 'UPDATE items SET sold = true WHERE id = ?', [itemID]
-		await this.db.run(sql)
+			//updating item to be sold
+			sql = 'UPDATE items SET sold = true WHERE id = ?', [itemID]
+			await this.db.run(sql)
 
-		return true
+			return true
+		} catch(err) {
+			throw err
+		}
 	}
 
 	async addInterestedUser(itemID, userID){
-		let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}";`
-		const data = await this.db.get(sql)
-		if(data.records !== 0) throw new Error(`user ${userID} already interested in this item`)
+		try {
+			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}";`
+			const data = await this.db.get(sql)
+			if(data.records !== 0) throw new Error(`user ${userID} already interested in this item`)
 
-		sql = `INSERT INTO usersOfInterest(itemID, userID) VALUES("${itemID}", "${userID}")`
-		await this.db.run(sql)
+			sql = `INSERT INTO usersOfInterest(itemID, userID) VALUES("${itemID}", "${userID}")`
+			await this.db.run(sql)
 
-		return true;
+			return true;
+		} catch(err) {
+			throw err
+		}
 	}
 
 	async removeInterestedUser(itemID, userID){
-		let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID ="${itemID}";`
-		const data = await this.db.get(sql)
-		if(data.records == 0) throw new Error(`user ${userID} NOT interested in this item`)
+		try {
+			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID ="${itemID}";`
+			const data = await this.db.get(sql)
+			if(data.records == 0) throw new Error(`user ${userID} NOT interested in this item`)
 
-		sql = `DELETE FROM usersOfInterest WHERE itemID = ${itemID} AND userID = ${userID}`
-		await this.db.run(sql)
+			sql = `DELETE FROM usersOfInterest WHERE itemID = ${itemID} AND userID = ${userID}`
+			await this.db.run(sql)
 
-		return true;
+			return true;
+		} catch(err) {
+			throw err
+		}
 	}
 	
 }

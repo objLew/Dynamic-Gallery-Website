@@ -144,21 +144,10 @@ router.post('/login', async ctx => {
 		const body = ctx.request.body
 		console.log(body)
 		const user = await new User(dbName)
-		await user.login(body.user, body.pass)
+		ctx.session.userID = await user.login(body.user, body.pass)
 		ctx.session.authorised = true
 		
-		
-		//Getting userID from username
-		const sql = `SELECT id FROM users WHERE user = "${body.user}"`
-		const db = await Database.open(dbName)
-		const data = await db.all(sql)
-		/*
-		console.log(data[0].id);
-		if(isNaN(data[0].id)) throw new Error("DATA IS NOT A FKIN NUMBER")
-		*/
-		console.log(data)
 		console.log(ctx.session.userID)
-		ctx.session.userID = data[0].id;
 
 		return await ctx.redirect('gallery')
 	} catch(err) {
@@ -230,6 +219,9 @@ router.get('/items/:index', async ctx => {
 	try {
 		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		//if(body.)
+
 		//Getting information on items from items DB
 		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
 		const db = await Database.open(dbName)
@@ -247,7 +239,6 @@ router.get('/items/:index', async ctx => {
 		if(fs.existsSync(`public/items/${itemData[0].title}1.png`)) images.push(itemData[0].title+"1")
 		if(fs.existsSync(`public/items/${itemData[0].title}2.png`)) images.push(itemData[0].title+"2")
 		if(fs.existsSync(`public/items/${itemData[0].title}3.png`)) images.push(itemData[0].title+"3")
-	
 		
 		await ctx.render('items', {image: images, id: itemData, user: userData})
 
@@ -260,6 +251,33 @@ router.post('/items/:index', koaBody, async ctx => {
 	try {
 		
 		console.log("user of interest added!")	
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+router.get('/items/:index/interested', async ctx => {
+	try{
+		const item = await new Item(dbName);
+
+		await item.addInterestedUser(ctx.params.index, ctx.session.userID);
+
+		console.log(ctx.params.index)
+		console.log("User interested")
+		
+		await ctx.redirect(`/items/${ctx.params.index}`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+router.get('/items/:index/unterested', async ctx => {
+	try{
+		const item = await new Item(dbName);
+
+		await item.removeInterestedUser(ctx.params.index, ctx.session.userID);
+
+		console.log(ctx.params.index)
+		console.log("User interested")
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
@@ -283,7 +301,6 @@ router.get('/user/:index', async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
-
 
 //setting up release
 app.use(router.routes())

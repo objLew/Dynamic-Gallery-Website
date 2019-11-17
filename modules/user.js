@@ -27,11 +27,12 @@ module.exports = class User {
 			if(pass.length === 0) throw new Error('missing password')
 
 			let sql = `SELECT COUNT(id) as records FROM users WHERE user="${user}";`
-			const data = await this.db.get(sql)
+			let data = await this.db.get(sql)
 			if(data.records !== 0) throw new Error(`username "${user}" already in use`)
 			pass = await bcrypt.hash(pass, saltRounds)
 			sql = `INSERT INTO users(user, email, paypal, pass) VALUES("${user}", "${email}", "${paypal}", "${pass}")`
 			await this.db.run(sql)
+
 			return true
 		} catch(err) {
 			throw err
@@ -56,7 +57,12 @@ module.exports = class User {
 			const record = await this.db.get(sql)
 			const valid = await bcrypt.compare(password, record.pass)
 			if(valid === false) throw new Error(`invalid password for account "${username}"`)
-			return true
+
+			//Getting userID from username
+			sql = `SELECT id FROM users WHERE user = "${username}"`
+			const data = await this.db.all(sql)
+
+			return data[0].id
 		} catch(err) {
 			throw err
 		}

@@ -192,6 +192,7 @@ describe('removeInterestedUser()', () => {
 			.rejects.toEqual( Error('user 1 NOT interested in this item') )
 		done()
     })
+    
 })
 
 

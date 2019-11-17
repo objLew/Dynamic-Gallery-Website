@@ -9,16 +9,19 @@
 		<link href="style.css" type="text/css" rel="stylesheet" />
 
 
+
 	</head>
 	<body>
 		<h1>{{this.title}}</h1>
 		<p><a href="/addItem">Add an Item</a></p>
 		<p><a href="/logout">log out</a></p>
-		<!--
-		<form action="/register" enctype="multipart/form-data" method="post">
-			<p><input type="submit" value="Create"></p>
+
+		{{#each id}}
+		<form action="/items/{{this.id}}/interested">
+			<button type="submit" value="showInterest">test button</button>
 		</form>
-		-->
+		{{/each}}
+
 		{{#each user}}
 		<a href="/user/{{this.id}}" >
 			<img src='../avatars/{{this.user}}.png' alt="{{this.user}}" width="75" height="50">
