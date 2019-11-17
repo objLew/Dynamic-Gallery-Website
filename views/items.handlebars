@@ -16,16 +16,21 @@
 		<p><a href="/addItem">Add an Item</a></p>
 		<p><a href="/logout">log out</a></p>
 
-		{{#each id}}
-		<form action="/items/{{this.id}}/interested">
-			<button type="submit" value="showInterest">show interest</button>
-		</form>
-		{{/each}}
-		{{#each id}}
-		<form action="/items/{{this.id}}/unterested">
-			<button type="submit" value="showInterest">remove interest</button>
-		</form>
-		{{/each}}
+		{{#unless interested}}
+			{{#each id}}
+			<form action="/items/{{this.id}}/interested">
+				<button type="submit" value="showInterest">show interest</button>
+			</form>
+			{{/each}}
+		{{/unless }}
+
+		{{#if interested}}
+			{{#each id}}
+			<form action="/items/{{this.id}}/unterested">
+				<button type="submit" value="showInterest">remove interest</button>
+			</form>
+			{{/each}}
+		{{/if}}
 
 		{{#each user}}
 		<a href="/user/{{this.id}}" >

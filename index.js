@@ -220,7 +220,7 @@ router.get('/items/:index', async ctx => {
 		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 
-		//if(body.)
+		const item = await new Item(dbName);
 
 		//Getting information on items from items DB
 		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
@@ -240,13 +240,15 @@ router.get('/items/:index', async ctx => {
 		if(fs.existsSync(`public/items/${itemData[0].title}2.png`)) images.push(itemData[0].title+"2")
 		if(fs.existsSync(`public/items/${itemData[0].title}3.png`)) images.push(itemData[0].title+"3")
 		
-		await ctx.render('items', {image: images, id: itemData, user: userData})
+		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
+
+		await ctx.render('items', {image: images, id: itemData, user: userData, interested: interested})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
-
+/*
 router.post('/items/:index', koaBody, async ctx => {
 	try {
 		
@@ -255,7 +257,7 @@ router.post('/items/:index', koaBody, async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
-
+*/
 router.get('/items/:index/interested', async ctx => {
 	try{
 		const item = await new Item(dbName);
