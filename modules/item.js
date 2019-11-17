@@ -44,6 +44,12 @@ module.exports = class items {
 	
 	async markAsSold(sellerID, buyerID, itemID){
 		try {
+			if(sellerID === null || isNaN(sellerID)) throw new Error('missing sellerID')
+			if(buyerID === null || isNaN(buyerID)) throw new Error('missing buyerID')
+			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
+
+			//TODO - check if user exists
+
 			//inserting transaction
 			let sql = `INSERT INTO transactions(sellerID, buyerID, itemID) VALUES("${sellerID}", "${buyerID}", "${itemID}")`
 			await this.db.run(sql)
@@ -60,6 +66,11 @@ module.exports = class items {
 
 	async addInterestedUser(itemID, userID){
 		try {
+			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
+			if(userID === null || isNaN(userID)) throw new Error('missing userID')
+			
+			//TODO - check if user exists
+
 			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}";`
 			const data = await this.db.get(sql)
 			if(data.records !== 0) throw new Error(`user ${userID} already interested in this item`)
@@ -75,6 +86,11 @@ module.exports = class items {
 
 	async removeInterestedUser(itemID, userID){
 		try {
+			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
+			if(userID === null || isNaN(userID)) throw new Error('missing userID')
+
+			//TODO - check if user exists
+
 			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID ="${itemID}";`
 			const data = await this.db.get(sql)
 			if(data.records == 0) throw new Error(`user ${userID} NOT interested in this item`)
