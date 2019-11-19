@@ -133,7 +133,7 @@ module.exports = class items {
 	async numberOfInterested(itemID){
 		try{
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
-			let sql = `SELECT COUNT(${itemID}) as records FROM usersOfInterest`
+			let sql = `SELECT COUNT(itemID) as records FROM usersOfInterest where itemID = ${itemID}`
 			const data = await this.db.get(sql)
 			
 			return data.records

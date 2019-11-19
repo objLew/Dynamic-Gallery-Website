@@ -21,22 +21,28 @@
 		
 		<!--if authorised user, let them click on items-->
 		{{#if auth}}
-			{{#each id}}
+			{{#each data}}
 				<a href="/items/{{this.id}}">
 					<div class="gallery" >
 						<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
 						<div class="title">{{this.title}}</div>
-						<div class="price">£{{this.price}}</div>
+						<div class="interest">Users watching: {{this.interest}}</div>
+						<div class="price" align="left">Price: £{{this.price}}</div>
 					</div>
 				</a>
 			{{/each}}
 		{{/if}}
+
+		
+
+		<!--else unable to click onto items-->
 		{{#unless auth}}
-			{{#each id}}
+			{{#each data}}
 				<div class="gallery" >
 					<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
 					<div class="title">{{this.title}}</div>
 					<div class="price">£{{this.price}}</div>
+					<div class="interest">Interested users: {{this.interest}}</div>
 				</div>
 			{{/each}}
 		{{/unless}}

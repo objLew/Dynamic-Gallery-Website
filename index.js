@@ -63,7 +63,7 @@ router.get('/gallery', async ctx => {
 	try {
 		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 		//item class so that 'create table if not exist' is able to run.
-		//const item = new Item(dbName)
+		const item = await new Item(dbName)
 		
 		//Getting information on items from items DB
 		const sql = 'SELECT * FROM items;'
@@ -71,8 +71,20 @@ router.get('/gallery', async ctx => {
 		const data = await db.all(sql)
 		await db.close()
 		
+		console.log("ID: "+data[0].id)
+		
+		console.log(data)
+
 		const auth = ctx.session.authorised
-		await ctx.render('gallery', {id: data, auth: auth})
+		//getting the interest for each item
+		const dataSize = Object.keys(data).length
+		const interest = []
+		for (var i = 0; i < dataSize; i++){
+			//interest.push(await item.numberOfInterested(data[i].id))
+			data[i].interest = await item.numberOfInterested(data[i].id)
+		}
+		
+		await ctx.render('gallery', {data: data, auth: auth, interest: interest})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -242,8 +254,8 @@ router.get('/items/:index', async ctx => {
 		if(fs.existsSync(`public/items/${itemData[0].title}3.png`)) images.push(itemData[0].title+"3")
 		
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
-
-		await ctx.render('items', {image: images, id: itemData, user: userData, interested: interested})
+		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
+		await ctx.render('items', {image: images, id: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -314,7 +326,7 @@ router.get('/delete', async ctx => {
 		const sql = `DROP TABLE usersOfInterest`
 		const db = await Database.open(dbName)
 		await db.run(sql)
-		
+		await db.close()
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
