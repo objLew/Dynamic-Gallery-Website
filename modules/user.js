@@ -1,9 +1,13 @@
+/* eslint-disable max-len */
+/* eslint-disable complexity */
 
 'use strict'
 
 const bcrypt = require('bcrypt-promise')
 // const fs = require('fs-extra')
-const mime = require('mime-types')
+
+//const mime = require('mime-types')
+
 const sqlite = require('sqlite-async')
 const saltRounds = 10
 
@@ -27,7 +31,7 @@ module.exports = class User {
 			if(pass.length === 0) throw new Error('missing password')
 
 			let sql = `SELECT COUNT(id) as records FROM users WHERE user="${user}";`
-			let data = await this.db.get(sql)
+			const data = await this.db.get(sql)
 			if(data.records !== 0) throw new Error(`username "${user}" already in use`)
 			pass = await bcrypt.hash(pass, saltRounds)
 			sql = `INSERT INTO users(user, email, paypal, pass) VALUES("${user}", "${email}", "${paypal}", "${pass}")`

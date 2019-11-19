@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/* eslint-disable max-len */
+/* eslint-disable max-lines */
+
 //Routes File
 
 'use strict'
@@ -36,7 +39,11 @@ const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 const dbName = 'website.db'
 
-const fs = require('fs-extra');
+const fs = require('fs-extra')
+
+
+const maxImages = 3
+
 
 /**
  * The secure home page.
@@ -61,30 +68,22 @@ router.get('/', async ctx => {
  */
 router.get('/gallery', async ctx => {
 	try {
-		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		//item class so that 'create table if not exist' is able to run.
 		const item = await new Item(dbName)
-		
+
 		//Getting information on items from items DB
 		const sql = 'SELECT * FROM items;'
 		const db = await Database.open(dbName)
 		const data = await db.all(sql)
 		await db.close()
-		
-		console.log("ID: "+data[0].id)
-		
-		console.log(data)
 
 		const auth = ctx.session.authorised
 		//getting the interest for each item
 		const dataSize = Object.keys(data).length
-		const interest = []
-		for (var i = 0; i < dataSize; i++){
-			//interest.push(await item.numberOfInterested(data[i].id))
+		for (let i = 0; i < dataSize; i++) {
 			data[i].interest = await item.numberOfInterested(data[i].id)
 		}
-		
-		await ctx.render('gallery', {data: data, auth: auth, interest: interest})
+
+		await ctx.render('gallery', {data: data, auth: auth})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -96,10 +95,12 @@ router.get('/gallery', async ctx => {
  *
  * @name Gallery Script
  * @route {POST} /gallery
+ *
+ * router.post('/gallery', koaBody, async ctx => {
+ *	//implement post
+ * })
  */
-router.post('/gallery', koaBody, async ctx => {
-	//implement post
-})
+
 
 /**
  * The user registration page.
@@ -127,7 +128,7 @@ router.post('/register', koaBody, async ctx => {
 
 		// call the functions in the module
 		const user = await new User(dbName)
-		
+
 		await user.register(body.user, body.email, body.paypal, body.pass)
 		//await user.uploadPicture(path, type)
 		// redirect to the home page
@@ -159,7 +160,7 @@ router.post('/login', async ctx => {
 		const user = await new User(dbName)
 		ctx.session.userID = await user.login(body.user, body.pass)
 		ctx.session.authorised = true
-		
+
 		console.log(ctx.session.userID)
 
 		return await ctx.redirect('gallery')
@@ -169,18 +170,16 @@ router.post('/login', async ctx => {
 })
 
 
-
 router.get('/logout', async ctx => {
 	ctx.session.authorised = null
 	ctx.redirect('/?msg=you are now logged out')
 })
 
 
-
 router.get('/addItem', async ctx => {
-		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		await ctx.render('addItem')
-		console.log(ctx.session.userID)
+	//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+	await ctx.render('addItem')
+	console.log(ctx.session.userID)
 })
 
 /**
@@ -196,27 +195,22 @@ router.post('/addItem', koaBody, async ctx => {
 		const body = ctx.request.body
 		console.log(body)
 
-
 		var {path, type} = ctx.request.files.pic1
-		console.log(path)
 		await fs.copy(path, `public/items/${body.title}1.png`)
 
 		var {path, type} = ctx.request.files.pic2
-		console.log(path)
 		await fs.copy(path, `public/items/${body.title}2.png`)
 
 		var {path, type} = ctx.request.files.pic3
-		console.log(path)
 		await fs.copy(path, `public/items/${body.title}3.png`)
 
-
-		const item = await new Item(dbName);
-		console.log(item);
+		const item = await new Item(dbName)
+		console.log(item)
 		console.log(ctx.session.userID)
 
 		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
-		await ctx.redirect('/gallery')	
+		await ctx.redirect('/gallery')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
@@ -230,10 +224,8 @@ router.post('/addItem', koaBody, async ctx => {
  */
 router.get('/items/:index', async ctx => {
 	try {
-		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-
-		const item = await new Item(dbName);
+		const item = await new Item(dbName)
 
 		//Getting information on items from items DB
 		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
@@ -241,18 +233,13 @@ router.get('/items/:index', async ctx => {
 		const itemData = await db.all(sqlItems)
 
 		const userID = itemData[0].userID
-		console.log(userID)
 		const sqlUser = `SELECT * FROM users where id = "${userID}"`
-
 		const userData = await db.all(sqlUser)
 		await db.close()
-
 		//checking how many pictures the item has
-		const images = [];
-		if(fs.existsSync(`public/items/${itemData[0].title}1.png`)) images.push(itemData[0].title+"1")
-		if(fs.existsSync(`public/items/${itemData[0].title}2.png`)) images.push(itemData[0].title+"2")
-		if(fs.existsSync(`public/items/${itemData[0].title}3.png`)) images.push(itemData[0].title+"3")
-		
+		const images = []
+		for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
+
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
 		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
@@ -264,8 +251,8 @@ router.get('/items/:index', async ctx => {
 /*
 router.post('/items/:index', koaBody, async ctx => {
 	try {
-		
-		console.log("user of interest added!")	
+
+		console.log("user of interest added!")
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
@@ -273,13 +260,10 @@ router.post('/items/:index', koaBody, async ctx => {
 */
 router.get('/items/:index/interested', async ctx => {
 	try{
-		const item = await new Item(dbName);
+		const item = await new Item(dbName)
 
-		await item.addInterestedUser(ctx.params.index, ctx.session.userID);
+		await item.addInterestedUser(ctx.params.index, ctx.session.userID)
 
-		console.log(ctx.params.index)
-		console.log("User interested")
-		
 		await ctx.redirect(`/items/${ctx.params.index}`)
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -288,12 +272,9 @@ router.get('/items/:index/interested', async ctx => {
 
 router.get('/items/:index/uninterested', async ctx => {
 	try{
-		const item = await new Item(dbName);
+		const item = await new Item(dbName)
 
-		await item.removeInterestedUser(ctx.params.index, ctx.session.userID);
-
-		console.log(ctx.params.index)
-		console.log("User not interested anymore")
+		await item.removeInterestedUser(ctx.params.index, ctx.session.userID)
 
 		await ctx.redirect(`/items/${ctx.params.index}`)
 	} catch(err) {
@@ -315,7 +296,7 @@ router.get('/user/:index', async ctx => {
 		const userItem = await db.all(sqlItems)
 		await db.close()
 
-		const userNumberInterest = await item.userNumberInterest(ctx.params.index);
+		const userNumberInterest = await item.userNumberInterest(ctx.params.index)
 
 		await ctx.render('user', {user: userData, item: userItem, userNumberInterest: userNumberInterest})
 
@@ -326,7 +307,7 @@ router.get('/user/:index', async ctx => {
 
 router.get('/delete', async ctx => {
 	try{
-		const sql = `DROP TABLE usersOfInterest`
+		const sql = 'DROP TABLE usersOfInterest'
 		const db = await Database.open(dbName)
 		await db.run(sql)
 		await db.close()
