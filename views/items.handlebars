@@ -13,15 +13,14 @@
 	</head>
 	<body>
 		<h1>{{this.title}}</h1>
-		
 		<p><a href="/gallery">back to home</a></p>
 		<p><a href="/logout">log out</a></p>
 		<p><a href="/addItem">Add an Item</a></p>
 	
-		<div class="name">Number of users interested in this item: {{numberOfInterested}}</div>
+		<p class="name">Number of users interested in this item: {{numberOfInterested}}</p>
 
 		{{#unless interested}}
-			{{#each id}}
+			{{#each item}}
 			<form action="/items/{{this.id}}/interested">
 				<button type="submit" value="showInterest">show interest</button>
 			</form>
@@ -29,7 +28,7 @@
 		{{/unless }}
 
 		{{#if interested}}
-			{{#each id}}
+			{{#each item}}
 			<form action="/items/{{this.id}}/uninterested">
 				<button type="submit" value="showInterest">remove interest</button>
 			</form>
@@ -48,7 +47,7 @@
 			<img src='../items/{{this}}.png' alt="{{this.title}}" width="300" height="200">
 		{{/each}}
 
-		{{#each id}}
+		{{#each item}}
 			
 			<div class="title">{{this.title}}</div>
 			<div class="price">£{{this.price}}</div>

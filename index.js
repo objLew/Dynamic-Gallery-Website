@@ -255,7 +255,7 @@ router.get('/items/:index', async ctx => {
 		
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
-		await ctx.render('items', {image: images, id: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
+		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -303,8 +303,10 @@ router.get('/items/:index/uninterested', async ctx => {
 
 router.get('/user/:index', async ctx => {
 	try {
-		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		const item = await new Item(dbName)
+
 		//Getting information on specified user from items DB
 		const sqlUser = `SELECT * FROM users where id = "${ctx.params.index}"`
 		const sqlItems = `SELECT * FROM items where userID = "${ctx.params.index}"`
@@ -313,7 +315,9 @@ router.get('/user/:index', async ctx => {
 		const userItem = await db.all(sqlItems)
 		await db.close()
 
-		await ctx.render('user', {user: userData, item: userItem})
+		const userNumberInterest = await item.userNumberInterest(ctx.params.index);
+
+		await ctx.render('user', {user: userData, item: userItem, userNumberInterest: userNumberInterest})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -321,8 +325,7 @@ router.get('/user/:index', async ctx => {
 })
 
 router.get('/delete', async ctx => {
-	try{	
-
+	try{
 		const sql = `DROP TABLE usersOfInterest`
 		const db = await Database.open(dbName)
 		await db.run(sql)

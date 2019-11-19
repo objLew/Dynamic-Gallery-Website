@@ -74,10 +74,6 @@ module.exports = class items {
 			let sql = `SELECT COUNT(${userID}) as records FROM usersOfInterest WHERE itemID="${itemID}" AND userID="${userID}";`
 			const data = await this.db.get(sql)
 			
-			console.log("item " + itemID)
-			console.log("user " + userID)
-			console.log(data)
-
 			if(data.records !== 0){
 				return true;
 			}
@@ -130,16 +126,31 @@ module.exports = class items {
 		}
 	}
 
-	async numberOfInterested(itemID){
+	async numberOfInterested(itemID){//Works
 		try{
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
-			let sql = `SELECT COUNT(itemID) as records FROM usersOfInterest where itemID = ${itemID}`
+
+			const sql = `SELECT COUNT(itemID) as records FROM usersOfInterest where itemID = ${itemID}`
 			const data = await this.db.get(sql)
-			
+
 			return data.records
 		} catch(err) {
 			throw err
 		}
 	}
+
+	async userNumberInterest(userID){//Doesnt
+		try{
+			if(userID === null || isNaN(userID)) throw new Error('missing userID')
+
+			const sql = `SELECT COUNT(userID) as records FROM usersOfInterest where userID = ${userID}`
+			const data = await this.db.get(sql)
+
+			return data.records
+		} catch(err) {
+			throw err
+		}
+	}
+
 	
 }

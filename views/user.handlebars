@@ -12,9 +12,13 @@
 	</head>
 	<body>
 		<h1>{{this.user}}s Page</h1>
+		{{/each}}
 		<p><a href="/gallery">back to home</a></p>
 		<p><a href="/logout">log out</a></p>
 
+		<p class="name">Number of items this user is interested in: {{userNumberInterest}}</p>
+
+		{{#each user}}
         <div class="user" >
             <img src='../avatars/{{this.user}}.png' alt="../avatars/avatar.png" width="300" height="200">
             <div class="title">Name: {{this.user}}</div>

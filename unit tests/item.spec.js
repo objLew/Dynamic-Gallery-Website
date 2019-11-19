@@ -308,7 +308,7 @@ describe('userNumberInterest()', () => {
         await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
 
         await expect( newItem.userNumberInterest(null) )
-			.rejects.toEqual( Error('missing itemID') )
+			.rejects.toEqual( Error('missing userID') )
 		done()
     })
 
