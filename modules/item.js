@@ -4,7 +4,6 @@
 'use strict'
 
 // const fs = require('fs-extra')
-
 //const mime = require('mime-types')
 
 const sqlite = require('sqlite-async')
@@ -154,6 +153,5 @@ module.exports = class items {
 			throw err
 		}
 	}
-
 
 }

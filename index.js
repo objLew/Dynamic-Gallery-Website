@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-
-/* eslint-disable max-len */
 /* eslint-disable max-lines */
+/* eslint-disable no-var */
+/* eslint-disable max-len */
 
 //Routes File
 
@@ -40,7 +40,6 @@ const port = process.env.PORT || defaultPort
 const dbName = 'website.db'
 
 const fs = require('fs-extra')
-
 
 const maxImages = 3
 
@@ -248,6 +247,19 @@ router.get('/items/:index', async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
+
+router.get('/items/:index/email', async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		const item = await new Item(dbName)
+
+		await ctx.render('email')
+
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
 /*
 router.post('/items/:index', koaBody, async ctx => {
 	try {
