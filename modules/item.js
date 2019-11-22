@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 /* eslint-disable complexity */
 
@@ -166,6 +167,12 @@ module.exports = class items {
 
 	async sendEmail(itemOwner, ineterestedUser, subject, text) {
 		try{
+
+			if(itemOwner === null) throw new Error('missing itemOwner')
+			if(ineterestedUser === null) throw new Error('missing ineterestedUser')
+			if(subject === null || subject.length === 0) throw new Error('missing subject')
+			if(text === null || text.length === 0) throw new Error('missing email body')
+
 			const mailOptions = {
 				from: `${ineterestedUser[0].email}`,
 				to: `${itemOwner[0].email}`,
@@ -175,13 +182,26 @@ module.exports = class items {
 
 			transporter.sendMail(mailOptions, (error, info) => {
 				if (error) {
-					console.log(error)
-				} else {
-					console.log(`Email sent: ${ info.response}`)
+					throw new Error(error)
 				}
 			})
 
 			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	async getUserIDFromItemID(itemID) {
+		try{
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			const sql = `SELECT userID FROM items WHERE id = "${itemID}"`
+			const data = await this.db.all(sql)
+
+			if(Object.keys(data).length === 0) throw new Error('item does not exist')
+
+			return data[0].userID
 		} catch(err) {
 			throw err
 		}

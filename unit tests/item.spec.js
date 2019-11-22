@@ -450,6 +450,18 @@ describe('getUserIDFromItemID()', () => {
 		done()
 	})
 
+	test('accessing non existent item', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await expect( newItem.getUserIDFromItemID(5) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
 	test('invalid itemID', async done => {
 		expect.assertions(1)
 
@@ -498,8 +510,8 @@ describe('sendEmail()', () => {
 
 		const interestedUser = await account.getDetails(2)
 
-		await expect( newItem.sendEmail(null, interestedUser, 'subject', 'body of email') )
-			.rejects.toEqual( Error('missing ownerID') )
+		await expect( newItem.sendEmail(null, interestedUser, 'subject of the email', 'body of email,test of nodejs') )
+			.rejects.toEqual( Error('missing itemOwner') )
 		done()
 	})
 
@@ -518,7 +530,7 @@ describe('sendEmail()', () => {
 		const itemOwner = await account.getDetails(1)
 
 		await expect( newItem.sendEmail(itemOwner, null, 'subject', 'body of email') )
-			.rejects.toEqual( Error('missing interestedUserID') )
+			.rejects.toEqual( Error('missing ineterestedUser') )
 		done()
 	})
 

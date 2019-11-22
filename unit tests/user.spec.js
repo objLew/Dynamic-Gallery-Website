@@ -104,7 +104,7 @@ describe('getDetails()', () => {
 		const account = await new Accounts()
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		const userData = account.getDetails(1)
+		const userData = await account.getDetails(1)
 
 		expect(userData[0].id).toBe(1)
 		done()
@@ -117,9 +117,18 @@ describe('getDetails()', () => {
 		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 		await account.register('doej2', 'doej2@gmail.com', 'doejpal2', 'password2')
 
-		const userData = account.getDetails(1)
+		const userData = await account.getDetails(2)
 
-		expect(userData[1].email).toBe('doej1@gmail.com')
+		expect(userData[0].email).toBe('doejONE@gmail.com')
+		done()
+	})
+
+	test('access non existent user', async done => {
+		expect.assertions(1)
+		const account = await new Accounts()
+
+		await expect( account.getDetails(5) )
+			.rejects.toEqual( Error('user does not exist') )
 		done()
 	})
 
