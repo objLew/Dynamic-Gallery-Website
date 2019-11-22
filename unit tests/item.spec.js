@@ -463,3 +463,99 @@ describe('getUserIDFromItemID()', () => {
 	})
 
 })
+
+describe('sendEmail()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+
+		const result = await newItem.sendEmail(itemOwner, interestedUser, 'subject', 'body of email')
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('invalid owner ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const interestedUser = await account.getDetails(2)
+
+		await expect( newItem.sendEmail(null, interestedUser, 'subject', 'body of email') )
+			.rejects.toEqual( Error('missing ownerID') )
+		done()
+	})
+
+	test('invalid interested user ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemOwner = await account.getDetails(1)
+
+		await expect( newItem.sendEmail(itemOwner, null, 'subject', 'body of email') )
+			.rejects.toEqual( Error('missing interestedUserID') )
+		done()
+	})
+
+	test('invalid email subject', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+
+		await expect( newItem.sendEmail(itemOwner, interestedUser, '', 'body of email') )
+			.rejects.toEqual( Error('missing subject') )
+		done()
+	})
+
+	test('invalid email body', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+
+		await expect( newItem.sendEmail(itemOwner, interestedUser, 'subject', '') )
+			.rejects.toEqual( Error('missing email body') )
+		done()
+	})
+
+})

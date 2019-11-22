@@ -138,7 +138,7 @@ module.exports = class items {
 		}
 	}
 
-	async numberOfInterested(itemID) {//Works
+	async numberOfInterested(itemID) {
 		try{
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
 
@@ -151,7 +151,7 @@ module.exports = class items {
 		}
 	}
 
-	async userNumberInterest(userID) {//Doesnt
+	async userNumberInterest(userID) {
 		try{
 			if(userID === null || isNaN(userID)) throw new Error('missing userID')
 
@@ -164,13 +164,13 @@ module.exports = class items {
 		}
 	}
 
-	async sendEmail(itemOwner, ineterestedUser) {
+	async sendEmail(itemOwner, ineterestedUser, subject, text) {
 		try{
 			const mailOptions = {
 				from: `${ineterestedUser[0].email}`,
 				to: `${itemOwner[0].email}`,
-				subject: 'Sending Email using Node.js',
-				text: 'That was easy!'
+				subject: `${subject}`,
+				text: `${text}`
 			}
 
 			transporter.sendMail(mailOptions, (error, info) => {
