@@ -310,7 +310,7 @@ router.get('/user/:index', async ctx => {
 router.get('/items/:index/email', async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		console.log('0')
+
 		await ctx.render('email', {item: ctx.params.index})
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -319,22 +319,22 @@ router.get('/items/:index/email', async ctx => {
 
 router.post('/items/:index/email', koaBody, async ctx => {
 	try {
-		console.log('1')
+
 		const body = ctx.request.body
-		console.log('1')
+
 		// get data from owner and interested user
 		const item = await new Item(dbName)
 		const user = await new User(dbName)
-		console.log('2')
+
 		const ownerID = await item.getUserIDFromItemID(ctx.params.index)	//Get the user ID from the item ID
-		console.log('3')
 		const interestedUser = await user.getDetails(ctx.session.userID)	//return all detials on the given user from the ID
 		const ownerDetails = await user.getDetails(ownerID)
-		console.log('5')
+
+		const itemDetails = await item.getDetails(ctx.params.index)
 
 		// owner can't email themselves
-		await item.sendEmail(ownerDetails, interestedUser, body.subject, body.body)
-		console.log('6')
+		await item.sendEmail(itemDetails, ownerDetails, interestedUser, body.subject, body.body, body.offer)
+
 		await ctx.redirect('/gallery')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})

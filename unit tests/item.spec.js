@@ -484,16 +484,17 @@ describe('sendEmail()', () => {
 		const newItem = await new Item()
 		const account = await new Accounts()
 
-		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
 
-		const result = await newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email')
+		const result = await newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', 5)
 
 		expect(result).toBe(true)
 		done()
@@ -514,8 +515,8 @@ describe('sendEmail()', () => {
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 
-		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject of the email', 'body of email,test of nodejs') )
-			.rejects.toEqual( Error('non existent item') )
+		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+			.rejects.toEqual( Error('missing item') )
 		done()
 	})
 
@@ -534,7 +535,7 @@ describe('sendEmail()', () => {
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
 
-		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject of the email', 'body of email,test of nodejs') )
+		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
 			.rejects.toEqual( Error('missing itemOwner') )
 		done()
 	})
@@ -554,8 +555,8 @@ describe('sendEmail()', () => {
 		const itemOwner = await account.getDetails(1)
 		const itemDetails = await newItem.getDetails(1)
 
-		await expect( newItem.sendEmail(itemDetails, itemOwner, null, 'subject', 'body of email') )
-			.rejects.toEqual( Error('missing ineterestedUser') )
+		await expect( newItem.sendEmail(itemDetails, itemOwner, null, 'subject', 'body of email', 5) )
+			.rejects.toEqual( Error('missing interestedUser') )
 		done()
 	})
 
@@ -569,11 +570,13 @@ describe('sendEmail()', () => {
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
 
-		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, '', 'body of email') )
+		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, '', 'body of email', 5) )
 			.rejects.toEqual( Error('missing subject') )
 		done()
 	})
@@ -588,16 +591,18 @@ describe('sendEmail()', () => {
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
 
-		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', '') )
+		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', '', 5) )
 			.rejects.toEqual( Error('missing email body') )
 		done()
 	})
 
-	test('invalid email body', async done => {
+	test('invalid offer', async done => {
 		expect.assertions(1)
 
 		//setup of item
@@ -607,12 +612,14 @@ describe('sendEmail()', () => {
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
 
-		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', '') )
-			.rejects.toEqual( Error('missing email body') )
+		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', null) )
+			.rejects.toEqual( Error('missing offer') )
 		done()
 	})
 
@@ -668,7 +675,7 @@ describe('getDetails()', () => {
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		await expect( newItem.getDetails(5) )
-			.rejects.toEqual( Error('non existent itemID') )
+			.rejects.toEqual( Error('item does not exist') )
 		done()
 	})
 
