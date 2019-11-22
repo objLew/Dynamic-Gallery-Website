@@ -165,7 +165,7 @@ module.exports = class items {
 		}
 	}
 
-	async sendEmail(itemOwner, ineterestedUser, subject, text) {
+	async sendEmail(item, itemOwner, ineterestedUser, subject, text) {
 		try{
 
 			if(itemOwner === null) throw new Error('missing itemOwner')
@@ -177,13 +177,11 @@ module.exports = class items {
 				from: `${ineterestedUser[0].email}`,
 				to: `${itemOwner[0].email}`,
 				subject: `${subject}`,
-				text: `${text}`
+				text: `From: ${ineterestedUser[0].email}${text}`
 			}
 
 			transporter.sendMail(mailOptions, (error, info) => {
-				if (error) {
-					throw new Error(error)
-				}
+				//sending the email
 			})
 
 			return true
