@@ -7,6 +7,16 @@
 //const mime = require('mime-types')
 
 const sqlite = require('sqlite-async')
+const nodemailer = require('nodemailer')
+
+const transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: 'nodejsgalleryapp@gmail.com',
+		pass: 'hanibalisthebest1'
+	}
+})
+
 
 module.exports = class items {
 
@@ -153,5 +163,6 @@ module.exports = class items {
 			throw err
 		}
 	}
+
 
 }

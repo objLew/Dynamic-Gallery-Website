@@ -421,3 +421,59 @@ describe('removeInterestedUser()', () => {
 
 })
 
+describe('getUserIDFromItemID()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		const result = await newItem.getUserIDFromItemID(1)
+
+		expect(result).toBe(1)
+		done()
+	})
+
+	test('appropriate setup with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(2, 'TWOmonalisa', 2000, 'TWOnice', 'very TWO nice')
+		await newItem.addItem(2, 'THREEmonalisa', 3000, 'THREEnice', 'very THREE nice')
+
+		const result = await newItem.getUserIDFromItemID(3)
+
+		expect(result).toBe(2)
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await expect( newItem.getUserIDFromItemID(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await expect( newItem.getUserIDFromItemID(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+})
+
+

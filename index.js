@@ -24,6 +24,7 @@ const Database = require('sqlite-async')
 /* IMPORT CUSTOM MODULES */
 const User = require('./modules/user')
 const Item = require('./modules/item')
+const Email = require('./modules/email')
 
 const app = new Koa()
 const router = new Router()
@@ -248,17 +249,6 @@ router.get('/items/:index', async ctx => {
 	}
 })
 
-router.get('/items/:index/email', async ctx => {
-	try {
-		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		const item = await new Item(dbName)
-
-		await ctx.render('email')
-
-	} catch(err) {
-		await ctx.render('error', {message: err.message})
-	}
-})
 
 /*
 router.post('/items/:index', koaBody, async ctx => {
@@ -312,6 +302,37 @@ router.get('/user/:index', async ctx => {
 
 		await ctx.render('user', {user: userData, item: userItem, userNumberInterest: userNumberInterest})
 
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+
+router.get('/items/:index/email', async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+
+		await ctx.render('email')
+
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+router.post('/items/:index/email', koaBody, async ctx => {
+	try {
+		// get data from owner and interested user
+		const item = await new Item(dbName)
+		const user = await new User(dbName)
+
+		const ownerID = item.getUserIDFromItemID(ctx.params.index)	//should get the user ID from the item ID
+		const interestedUser = user.getDetails(ctx.session.userID)	//should return all detials on the given user from the ID
+		const ownerDetails = user.getDetails(ownerID)
+		// owner can't email themselves
+		await new Email(ownerDetails, interestedUser)
+
+		await ctx.redirect('/gallery')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
