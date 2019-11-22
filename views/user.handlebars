@@ -12,20 +12,25 @@
 	</head>
 	<body>
 		<h1>{{this.user}}s Page</h1>
+		{{/each}}
+		<p><a href="/gallery">back to home</a></p>
 		<p><a href="/logout">log out</a></p>
 
+		<p class="name">Number of items this user is interested in: {{userNumberInterest}}</p>
+
+		{{#each user}}
         <div class="user" >
-            <img src='../avatars/{{this.user}}.png' alt="Cinque Terre" width="300" height="200">
+            <img src='../avatars/{{this.user}}.png' alt="../avatars/avatar.png" width="300" height="200">
             <div class="title">Name: {{this.user}}</div>
             <div class="title">Email: {{this.email}}</div>
-            <div class="title">{{this.user}}</div>
+            <!--<div class="title">{{this.paypal}}</div>-->
         </div>
         {{/each}}
 
         {{#each item}}
 		<a href="/items/{{this.id}}">
 			<div class="gallery" >
-				<img src='../items/{{this.title}}.png' alt="Cinque Terre" width="300" height="200">
+				<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
 				<div class="title">{{this.title}}</div>
 				<div class="price">£{{this.price}}</div>
 			</div>

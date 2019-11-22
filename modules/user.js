@@ -1,9 +1,13 @@
+/* eslint-disable max-len */
+/* eslint-disable complexity */
 
 'use strict'
 
 const bcrypt = require('bcrypt-promise')
 // const fs = require('fs-extra')
-const mime = require('mime-types')
+
+//const mime = require('mime-types')
+
 const sqlite = require('sqlite-async')
 const saltRounds = 10
 
@@ -32,6 +36,7 @@ module.exports = class User {
 			pass = await bcrypt.hash(pass, saltRounds)
 			sql = `INSERT INTO users(user, email, paypal, pass) VALUES("${user}", "${email}", "${paypal}", "${pass}")`
 			await this.db.run(sql)
+
 			return true
 		} catch(err) {
 			throw err
@@ -56,7 +61,12 @@ module.exports = class User {
 			const record = await this.db.get(sql)
 			const valid = await bcrypt.compare(password, record.pass)
 			if(valid === false) throw new Error(`invalid password for account "${username}"`)
-			return true
+
+			//Getting userID from username
+			sql = `SELECT id FROM users WHERE user = "${username}"`
+			const data = await this.db.all(sql)
+
+			return data[0].id
 		} catch(err) {
 			throw err
 		}
