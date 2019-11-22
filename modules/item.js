@@ -164,5 +164,28 @@ module.exports = class items {
 		}
 	}
 
+	async sendEmail(itemOwner, ineterestedUser) {
+		try{
+			const mailOptions = {
+				from: `${ineterestedUser[0].email}`,
+				to: `${itemOwner[0].email}`,
+				subject: 'Sending Email using Node.js',
+				text: 'That was easy!'
+			}
+
+			transporter.sendMail(mailOptions, (error, info) => {
+				if (error) {
+					console.log(error)
+				} else {
+					console.log(`Email sent: ${ info.response}`)
+				}
+			})
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
 
 }

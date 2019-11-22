@@ -429,7 +429,6 @@ describe('getUserIDFromItemID()', () => {
 		const newItem = await new Item()
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
-
 		const result = await newItem.getUserIDFromItemID(1)
 
 		expect(result).toBe(1)
@@ -463,17 +462,4 @@ describe('getUserIDFromItemID()', () => {
 		done()
 	})
 
-	test('invalid itemID', async done => {
-		expect.assertions(1)
-
-		//setup of item
-		const newItem = await new Item()
-		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-
-		await expect( newItem.getUserIDFromItemID(null) )
-			.rejects.toEqual( Error('missing itemID') )
-		done()
-	})
 })
-
-

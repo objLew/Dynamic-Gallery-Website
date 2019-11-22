@@ -97,3 +97,39 @@ describe('login()', () => {
 	})
 
 })
+
+describe('getDetails()', () => {
+	test('get details of valid user', async done => {
+		expect.assertions(1)
+		const account = await new Accounts()
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+
+		const userData = account.getDetails(1)
+
+		expect(userData[0].id).toBe(1)
+		done()
+	})
+
+	test('get details of valid user with multiple users', async done => {
+		expect.assertions(1)
+		const account = await new Accounts()
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		await account.register('doej2', 'doej2@gmail.com', 'doejpal2', 'password2')
+
+		const userData = account.getDetails(1)
+
+		expect(userData[1].email).toBe('doej1@gmail.com')
+		done()
+	})
+
+	test('invalid userID', async done => {
+		expect.assertions(1)
+		const account = await new Accounts()
+
+		await expect( account.getDetails(null) )
+			.rejects.toEqual( Error('missing userID') )
+		done()
+	})
+
+})

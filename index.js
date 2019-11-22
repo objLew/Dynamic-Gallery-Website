@@ -327,6 +327,7 @@ router.post('/items/:index/email', koaBody, async ctx => {
 		const user = await new User(dbName)
 
 		const ownerID = item.getUserIDFromItemID(ctx.params.index)	//should get the user ID from the item ID
+
 		const interestedUser = user.getDetails(ctx.session.userID)	//should return all detials on the given user from the ID
 		const ownerDetails = user.getDetails(ownerID)
 		// owner can't email themselves
