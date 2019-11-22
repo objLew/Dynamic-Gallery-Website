@@ -6,9 +6,7 @@
 		<title>{{this.title}}</title>
 		<meta name="description" content="Homepage for the Gallery">
 		<meta name="author" content="Lewis Lovette">
-		<link href="style.css" type="text/css" rel="stylesheet" />
-
-
+		<!--<link href="style.css" type="text/css" rel="stylesheet" />-->
 
 	</head>
 	<body>
@@ -16,8 +14,10 @@
 		<p><a href="/gallery">back to home</a></p>
 		<p><a href="/logout">log out</a></p>
         
-		<form action="/register" enctype="multipart/form-data" method="post">
-			<p>Write Email:<br /><input type="text" name="email" placeholder="send an email" value=""></p>
+		<form action="/items/{{item}}/email" enctype="multipart/form-data" method="post">
+            <p>Subject:<br /><input type="text" name="subject" placeholder="send an email" value=""></p>
+			<p>Body:<br /><input type="text" name="body" placeholder="send an email" value=""></p>
+            <p>Offer:<br /><input type="text" name="offer" placeholder="send an email" value=""></p>
 			<p><input type="submit" value="Send"></p>
 		</form>
 		

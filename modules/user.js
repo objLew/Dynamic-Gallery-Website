@@ -72,4 +72,19 @@ module.exports = class User {
 		}
 	}
 
+	async getDetails(userID) {
+		try{
+			if(userID === null || userID.length === 0) throw new Error('missing userID')
+
+			const sql = `SELECT * FROM users WHERE id = "${userID}"`
+			const data = await this.db.all(sql)
+
+			if(Object.keys(data).length === 0) throw new Error('user does not exist')
+
+			return data
+		} catch(err) {
+			throw err
+		}
+	}
+
 }

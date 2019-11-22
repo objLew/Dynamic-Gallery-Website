@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable max-len */
 /* eslint-disable complexity */
 
@@ -138,7 +139,7 @@ module.exports = class items {
 		}
 	}
 
-	async numberOfInterested(itemID) {//Works
+	async numberOfInterested(itemID) {
 		try{
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
 
@@ -151,7 +152,7 @@ module.exports = class items {
 		}
 	}
 
-	async userNumberInterest(userID) {//Doesnt
+	async userNumberInterest(userID) {
 		try{
 			if(userID === null || isNaN(userID)) throw new Error('missing userID')
 
@@ -164,5 +165,65 @@ module.exports = class items {
 		}
 	}
 
+	async sendEmail(item, itemOwner, interestedUser, subject, text, offer) {
+		try{
+			if(item === null) throw new Error('missing item')
+			if(itemOwner === null) throw new Error('missing itemOwner')
+			if(interestedUser === null) throw new Error('missing interestedUser')
+			if(subject === null || subject.length === 0) throw new Error('missing subject')
+			if(text === null || text.length === 0) throw new Error('missing email body')
+			if(offer === null || isNaN(offer)) throw new Error('missing offer')
+
+
+			const mailOptions = {
+				from: `${interestedUser[0].email}`,
+				to: `${itemOwner[0].email}`,
+				subject: `${subject}`,
+				text: `From: ${interestedUser[0].email}
+				\n Queried Item: ${item[0].title}
+				\n Original item price: ${item[0].price}
+				\n ${interestedUser[0].user}'s message: ${text}
+				\n Their offer: £${offer}`
+			}
+
+			transporter.sendMail(mailOptions, (error, info) => {
+				//sending the email
+			})
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	async getUserIDFromItemID(itemID) {
+		try{
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			const sql = `SELECT userID FROM items WHERE id = "${itemID}"`
+			const data = await this.db.all(sql)
+
+			if(Object.keys(data).length === 0) throw new Error('item does not exist')
+
+			return data[0].userID
+		} catch(err) {
+			throw err
+		}
+	}
+
+	async getDetails(itemID) {
+		try{
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			const sql = `SELECT * FROM items WHERE id = "${itemID}"`
+			const data = await this.db.all(sql)
+
+			if(Object.keys(data).length === 0) throw new Error('item does not exist')
+
+			return data
+		} catch(err) {
+			throw err
+		}
+	}
 
 }

@@ -38,15 +38,13 @@
 		{{#each user}}
 		<a href="/user/{{this.id}}" >
 			<img src='../avatars/{{this.user}}.png' alt="../avatars/avatar.png" width="75" height="50">
-			<div class="name">Username: {{this.user}}</div>
-			<div class="title" style="padding-bottom: 40px">Email: {{this.email}}</div>
-			
+			<div class="name">Username: {{this.user}}</div>			
 		</a>
 		{{/each}}
 
 		{{#each item}}
 			<form action="/items/{{this.id}}/email">
-				<button type="submit" value="sendEmail">Send an email to: {{this.user}}</button>
+				<button type="submit" value="sendEmail">Contact Seller</button>
 			</form>
 		{{/each}}
 

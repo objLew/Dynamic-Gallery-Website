@@ -24,7 +24,6 @@ const Database = require('sqlite-async')
 /* IMPORT CUSTOM MODULES */
 const User = require('./modules/user')
 const Item = require('./modules/item')
-const Email = require('./modules/email')
 
 const app = new Koa()
 const router = new Router()
@@ -312,9 +311,7 @@ router.get('/items/:index/email', async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 
-
-		await ctx.render('email')
-
+		await ctx.render('email', {item: ctx.params.index})
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
@@ -322,15 +319,21 @@ router.get('/items/:index/email', async ctx => {
 
 router.post('/items/:index/email', koaBody, async ctx => {
 	try {
+
+		const body = ctx.request.body
+
 		// get data from owner and interested user
 		const item = await new Item(dbName)
 		const user = await new User(dbName)
 
-		const ownerID = item.getUserIDFromItemID(ctx.params.index)	//should get the user ID from the item ID
-		const interestedUser = user.getDetails(ctx.session.userID)	//should return all detials on the given user from the ID
-		const ownerDetails = user.getDetails(ownerID)
+		const ownerID = await item.getUserIDFromItemID(ctx.params.index)	//Get the user ID from the item ID
+		const interestedUser = await user.getDetails(ctx.session.userID)	//return all detials on the given user from the ID
+		const ownerDetails = await user.getDetails(ownerID)
+
+		const itemDetails = await item.getDetails(ctx.params.index)
+
 		// owner can't email themselves
-		await new Email(ownerDetails, interestedUser)
+		await item.sendEmail(itemDetails, ownerDetails, interestedUser, body.subject, body.body, body.offer)
 
 		await ctx.redirect('/gallery')
 	} catch(err) {

@@ -429,7 +429,6 @@ describe('getUserIDFromItemID()', () => {
 		const newItem = await new Item()
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
-
 		const result = await newItem.getUserIDFromItemID(1)
 
 		expect(result).toBe(1)
@@ -451,15 +450,15 @@ describe('getUserIDFromItemID()', () => {
 		done()
 	})
 
-	test('invalid itemID', async done => {
+	test('accessing non existent item', async done => {
 		expect.assertions(1)
 
 		//setup of item
 		const newItem = await new Item()
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
-		await expect( newItem.getUserIDFromItemID(null) )
-			.rejects.toEqual( Error('missing itemID') )
+		await expect( newItem.getUserIDFromItemID(5) )
+			.rejects.toEqual( Error('item does not exist') )
 		done()
 	})
 
@@ -474,6 +473,210 @@ describe('getUserIDFromItemID()', () => {
 			.rejects.toEqual( Error('missing itemID') )
 		done()
 	})
+
 })
 
+describe('sendEmail()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
 
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+
+		const result = await newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', 5)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('invalid item', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+
+		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+			.rejects.toEqual( Error('missing item') )
+		done()
+	})
+
+	test('invalid owner ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const interestedUser = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+
+		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+			.rejects.toEqual( Error('missing itemOwner') )
+		done()
+	})
+
+	test('invalid interested user ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemOwner = await account.getDetails(1)
+		const itemDetails = await newItem.getDetails(1)
+
+		await expect( newItem.sendEmail(itemDetails, itemOwner, null, 'subject', 'body of email', 5) )
+			.rejects.toEqual( Error('missing interestedUser') )
+		done()
+	})
+
+	test('invalid email subject', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+
+		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, '', 'body of email', 5) )
+			.rejects.toEqual( Error('missing subject') )
+		done()
+	})
+
+	test('invalid email body', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+
+		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', '', 5) )
+			.rejects.toEqual( Error('missing email body') )
+		done()
+	})
+
+	test('invalid offer', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemOwner = await account.getDetails(1)
+		const interestedUser = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+
+		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', null) )
+			.rejects.toEqual( Error('missing offer') )
+		done()
+	})
+
+})
+
+describe('getDetails()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.getDetails(1)
+
+		expect(result[0].title).toBe('monalisa')
+		done()
+	})
+
+	test('get details with multiple items', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'TWOmonalisa', 2000, 'TWOnice', 'TWOvery nice')
+		await newItem.addItem(2, 'THREEmonalisa', 3000, 'THREEnice', 'THREE very nice')
+
+		const result = await newItem.getDetails(2)
+
+		expect(result[0].title).toBe('TWOmonalisa')
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		await expect( newItem.getDetails(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('non existent item', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await expect( newItem.getDetails(5) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+})
