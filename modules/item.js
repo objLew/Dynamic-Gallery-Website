@@ -37,6 +37,16 @@ module.exports = class items {
 		})()
 	}
 
+	/**
+	 * Adds an item to the database
+	 * @name addItem
+	 * @param {number} userID
+	 * @param {string} title
+	 * @param {number} price
+	 * @param {string} shortDesc
+	 * @param {string} longDesc
+	 * @returns true if the item is successfully added to the database
+	 */
 	async addItem(userID, title, price, shortDesc, longDesc) {
 		try {
 			//TODO: unit test for lengths of everything
@@ -56,6 +66,14 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 *	Marks an item as sold, updates transaction table with the seller, buyer and item id
+	 * @name markAsSold
+	 * @param {number} sellerID
+	 * @param {number} buyerID
+	 * @param {number} itemID
+	 * @returns true if item transaction is successfully marked as sold
+	 */
 	async markAsSold(sellerID, buyerID, itemID) {
 		try {
 			if(sellerID === null || isNaN(sellerID)) throw new Error('missing sellerID')
@@ -78,7 +96,13 @@ module.exports = class items {
 		}
 	}
 
-	//returns true if the user is interested in an item, false if not currently interested
+	/**
+	 * Checks if the user is interested in an item
+	 * @name isInterested
+	 * @param {number} itemID
+	 * @param {number} userID
+	 * @returns true if the user is interested in an item, false if not currently interested
+	 */
 	async isInterested(itemID, userID) {
 		try{
 
@@ -99,6 +123,13 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Correlates a user to an item to show they are interested
+	 * @name addInterestedUser
+	 * @param {number} itemID
+	 * @param {number} userID
+	 * @returns true if the user is successfully added
+	 */
 	async addInterestedUser(itemID, userID) {
 		try {
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
@@ -119,6 +150,13 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Removed a user from the list of users interested in an item
+	 * @name removeInterestedUser
+	 * @param {number} itemID
+	 * @param {number} userID
+	 * @returns true if operation is successful
+	 */
 	async removeInterestedUser(itemID, userID) {
 		try {
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
@@ -139,6 +177,12 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Gets the amount of users interested in the item
+	 * @name numberOfInterested
+	 * @param {number} itemID
+	 * @returns integer representing the amount of users interested in the item
+	 */
 	async numberOfInterested(itemID) {
 		try{
 			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
@@ -152,6 +196,12 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Gets the number of items the user is interested in
+	 * @name userNumberInterest
+	 * @param {number} userID
+	 * @returns integer representing the number of items the user is interested in
+	 */
 	async userNumberInterest(userID) {
 		try{
 			if(userID === null || isNaN(userID)) throw new Error('missing userID')
@@ -165,6 +215,18 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 *	Sends an email from the current user to the owner of the item
+	 * @name sendEmail
+	 * @param {Object} item - All details of an item eg. {id INTEGER, userID INTEGER, title TEXT, price INTEGER, shortDesc TEXT, longDesc TEXT, sold BOOLEAN}
+	 * @param {Object} itemOwner - All user details eg. {id INTEGER, user TEXT, email TEXT, paypal TEXT, pass TEXT}
+	 * @param {Object} interestedUser - All user details eg. {id INTEGER, user TEXT, email TEXT, paypal TEXT, pass TEXT}
+	 * @param {string} subject
+	 * @param {string} text
+	 * @param {number} offer
+	 * @returns true if email is successfully sent
+	 */
+	// eslint-disable-next-line max-params
 	async sendEmail(item, itemOwner, interestedUser, subject, text, offer) {
 		try{
 			if(item === null) throw new Error('missing item')
@@ -196,6 +258,12 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Gets the id of the user that created the item
+	 * @name getUserIDFromItemID
+	 * @param {number} itemID
+	 * @returns the id of the user that created the item
+	 */
 	async getUserIDFromItemID(itemID) {
 		try{
 			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
@@ -211,6 +279,12 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Gets all the details of an item
+	 * @name getDetails
+	 * @param {number} itemID
+	 * @returns all details of an item in an object.
+	 */
 	async getDetails(itemID) {
 		try{
 			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
