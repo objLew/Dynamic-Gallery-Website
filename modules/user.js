@@ -23,6 +23,15 @@ module.exports = class User {
 		})()
 	}
 
+	/**
+	 * Inserts a new users details into the database
+	 * @name register
+	 * @param {string} user
+	 * @param {string} email
+	 * @param {string} paypal
+	 * @param {string} pass
+	 * @returns true if details are successfully added.
+	 */
 	async register(user, email, paypal, pass) {
 		try {
 			if(user.length === 0) throw new Error('missing username')
@@ -52,6 +61,13 @@ module.exports = class User {
 	}
 	*/
 
+	/**
+	 * Authenticates user details, signs them in if valid
+	 * @name login
+	 * @param {string} username
+	 * @param {string} password
+	 * @returns the id of the user that has signed in
+	 */
 	async login(username, password) {
 		try {
 			let sql = `SELECT count(id) AS count FROM users WHERE user="${username}";`
@@ -72,6 +88,12 @@ module.exports = class User {
 		}
 	}
 
+	/**
+	 *	Gets all the details for a user given the users ID
+	 * @name getDetails
+	 * @param {number} userID
+	 * @returns {Object} containing all of the user details eg. {id INTEGER, user TEXT, email TEXT, paypal TEXT, pass TEXT}
+	 */
 	async getDetails(userID) {
 		try{
 			if(userID === null || userID.length === 0) throw new Error('missing userID')

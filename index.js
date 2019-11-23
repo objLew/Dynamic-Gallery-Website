@@ -89,7 +89,8 @@ router.get('/gallery', async ctx => {
 	}
 })
 
-/**
+// CHANGE TO /**
+/*
  * The script to process new user registrations.
  *
  * @name Gallery Script
@@ -137,6 +138,13 @@ router.post('/register', koaBody, async ctx => {
 	}
 })
 
+
+/**
+ * The user login page.
+ *
+ * @name Login Page
+ * @route {GET} /login
+ */
 router.get('/login', async ctx => {
 	const data = {}
 	if(ctx.query.msg) data.msg = ctx.query.msg
@@ -168,15 +176,27 @@ router.post('/login', async ctx => {
 	}
 })
 
-
+/**
+ * The user logout page.
+ *
+ * @name Logout Page
+ * @route {GET} /logout
+ */
 router.get('/logout', async ctx => {
 	ctx.session.authorised = null
 	ctx.redirect('/?msg=you are now logged out')
 })
 
 
+/**
+ * The page for users to add items.
+ *
+ * @name AddItem Page
+ * @route {GET} /addItem
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/addItem', async ctx => {
-	//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+	if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 	await ctx.render('addItem')
 	console.log(ctx.session.userID)
 })
@@ -184,7 +204,7 @@ router.get('/addItem', async ctx => {
 /**
  * The script to process new items added.
  *
- * @name addItem Script
+ * @name AddItem Script
  * @route {POST} /addItem
  */
 
@@ -216,10 +236,11 @@ router.post('/addItem', koaBody, async ctx => {
 })
 
 /**
- * The script to process the currently clicked ite.
+ * Page to display items.
  *
- * @name items Script
- * @route {POST} /items
+ * @name Items Page
+ * @route {GET} /items/:index
+ * @authentication This route requires cookie-based authentication.
  */
 router.get('/items/:index', async ctx => {
 	try {
@@ -249,16 +270,12 @@ router.get('/items/:index', async ctx => {
 })
 
 
-/*
-router.post('/items/:index', koaBody, async ctx => {
-	try {
-
-		console.log("user of interest added!")
-	} catch(err) {
-		await ctx.render('error', {message: err.message})
-	}
-})
-*/
+/**
+ * The page to handle users adding interest.
+ *
+ * @name Interested Page
+ * @route {GET} /items/:index/interested
+ */
 router.get('/items/:index/interested', async ctx => {
 	try{
 		const item = await new Item(dbName)
@@ -271,6 +288,12 @@ router.get('/items/:index/interested', async ctx => {
 	}
 })
 
+/**
+ * The page to handle users removing interest.
+ *
+ * @name Uninterested Page
+ * @route {GET} /items/:index/uninterested
+ */
 router.get('/items/:index/uninterested', async ctx => {
 	try{
 		const item = await new Item(dbName)
@@ -283,6 +306,13 @@ router.get('/items/:index/uninterested', async ctx => {
 	}
 })
 
+/**
+ * The page to display user information.
+ *
+ * @name User Page
+ * @route {GET} /user/:index
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/user/:index', async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
@@ -306,7 +336,13 @@ router.get('/user/:index', async ctx => {
 	}
 })
 
-
+/**
+ * The page to write a GDPR email.
+ *
+ * @name Email Page
+ * @route {GET} /items/:index/email
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/items/:index/email', async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
@@ -317,6 +353,12 @@ router.get('/items/:index/email', async ctx => {
 	}
 })
 
+/**
+ * The script to process emails.
+ *
+ * @name Email Script
+ * @route {POST} /items/:index/email
+ */
 router.post('/items/:index/email', koaBody, async ctx => {
 	try {
 
@@ -341,16 +383,6 @@ router.post('/items/:index/email', koaBody, async ctx => {
 	}
 })
 
-router.get('/delete', async ctx => {
-	try{
-		const sql = 'DROP TABLE usersOfInterest'
-		const db = await Database.open(dbName)
-		await db.run(sql)
-		await db.close()
-	} catch(err) {
-		await ctx.render('error', {message: err.message})
-	}
-})
 
 //setting up release
 app.use(router.routes())
