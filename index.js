@@ -212,7 +212,7 @@ router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
 		const body = ctx.request.body
-		console.log(body)
+		const item = await new Item(dbName)
 
 		var {path, type} = ctx.request.files.pic1
 		await fs.copy(path, `public/items/${body.title}1.png`)
@@ -223,9 +223,6 @@ router.post('/addItem', koaBody, async ctx => {
 		var {path, type} = ctx.request.files.pic3
 		await fs.copy(path, `public/items/${body.title}3.png`)
 
-		const item = await new Item(dbName)
-		console.log(item)
-		console.log(ctx.session.userID)
 
 		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
@@ -246,16 +243,15 @@ router.get('/items/:index', async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 		const item = await new Item(dbName)
+		const user = await new User(dbName)
 
 		//Getting information on items from items DB
-		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
-		const db = await Database.open(dbName)
-		const itemData = await db.all(sqlItems)
+		const itemData = await item.getDetails(ctx.params.index)
 
-		const userID = itemData[0].userID
-		const sqlUser = `SELECT * FROM users where id = "${userID}"`
-		const userData = await db.all(sqlUser)
-		await db.close()
+		//Getting information on items from items DB
+		const userID = await itemData[0].userID
+		const userData = await user.getDetails(userID)
+
 		//checking how many pictures the item has
 		const images = []
 		for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
@@ -321,6 +317,7 @@ router.get('/user/:index', async ctx => {
 
 		//Getting information on specified user from items DB
 		const sqlUser = `SELECT * FROM users where id = "${ctx.params.index}"`
+		const userData = await user.getDetails(ctx.params.index)
 		const sqlItems = `SELECT * FROM items where userID = "${ctx.params.index}"`
 		const db = await Database.open(dbName)
 		const userData = await db.all(sqlUser)
