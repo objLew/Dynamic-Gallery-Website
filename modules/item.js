@@ -7,6 +7,9 @@
 // const fs = require('fs-extra')
 //const mime = require('mime-types')
 
+const maxImages = 3
+const fs = require('fs-extra')
+
 const sqlite = require('sqlite-async')
 const nodemailer = require('nodemailer')
 
@@ -316,6 +319,23 @@ module.exports = class items {
 			if(Object.keys(userItems).length === 0) throw new Error('user does not exist')
 			
 			return userItems
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Checks how many images exist
+	 * @name getImages
+	 * @param {Object} itemData 
+	 * @returns an array of image locations
+	 */
+	async getImages(itemData){
+		try{
+			const images = []
+			for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
+
+			return images
 		} catch(err) {
 			throw err
 		}

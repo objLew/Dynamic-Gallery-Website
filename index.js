@@ -252,9 +252,8 @@ router.get('/items/:index', async ctx => {
 		const userID = await itemData[0].userID
 		const userData = await user.getDetails(userID)
 
-		//checking how many pictures the item has
-		const images = []
-		for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
+		//getting the images for the item
+		const images = await item.getImages(itemData);
 
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
