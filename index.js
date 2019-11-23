@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/* eslint-disable max-lines */
+/* eslint-disable no-var */
+/* eslint-disable max-len */
 
 //Routes File
 
@@ -12,10 +15,15 @@ const staticDir = require('koa-static')
 const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
+
+const Database = require('sqlite-async')
+//const stat = require('koa-static')
+//const handlebars = require('koa-hbs-renderer')
 //const jimp = require('jimp')
 
 /* IMPORT CUSTOM MODULES */
 const User = require('./modules/user')
+const Item = require('./modules/item')
 
 const app = new Koa()
 const router = new Router()
@@ -30,6 +38,11 @@ app.use(views(`${__dirname}/views`, { extension: 'handlebars' }, {map: { handleb
 const defaultPort = 8080
 const port = process.env.PORT || defaultPort
 const dbName = 'website.db'
+
+const fs = require('fs-extra')
+
+const maxImages = 3
+
 
 /**
  * The secure home page.
@@ -54,24 +67,40 @@ router.get('/', async ctx => {
  */
 router.get('/gallery', async ctx => {
 	try {
-		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		const data = {}
-		if(ctx.query.msg) data.msg = ctx.query.msg
-		await ctx.render('gallery')
+		const item = await new Item(dbName)
+
+		//Getting information on items from items DB
+		const sql = 'SELECT * FROM items;'
+		const db = await Database.open(dbName)
+		const data = await db.all(sql)
+		await db.close()
+
+		const auth = ctx.session.authorised
+		//getting the interest for each item
+		const dataSize = Object.keys(data).length
+		for (let i = 0; i < dataSize; i++) {
+			data[i].interest = await item.numberOfInterested(data[i].id)
+		}
+
+		await ctx.render('gallery', {data: data, auth: auth})
+
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
 
-/**
+// CHANGE TO /**
+/*
  * The script to process new user registrations.
  *
  * @name Gallery Script
  * @route {POST} /gallery
+ *
+ * router.post('/gallery', koaBody, async ctx => {
+ *	//implement post
+ * })
  */
-router.post('/gallery', koaBody, async ctx => {
-	//implement post
-})
+
 
 /**
  * The user registration page.
@@ -92,10 +121,16 @@ router.post('/register', koaBody, async ctx => {
 		// extract the data from the request
 		const body = ctx.request.body
 		console.log(body)
+
+		const {path, type} = ctx.request.files.avatar
+
+		await fs.copy(path, `public/avatars/${body.user}.png`)
+
 		// call the functions in the module
 		const user = await new User(dbName)
-		await user.register(body.user, body.pass)
-		// await user.uploadPicture(path, type)
+
+		await user.register(body.user, body.email, body.paypal, body.pass)
+		//await user.uploadPicture(path, type)
 		// redirect to the home page
 		ctx.redirect(`/?msg=new user "${body.name}" added`)
 	} catch(err) {
@@ -103,6 +138,13 @@ router.post('/register', koaBody, async ctx => {
 	}
 })
 
+
+/**
+ * The user login page.
+ *
+ * @name Login Page
+ * @route {GET} /login
+ */
 router.get('/login', async ctx => {
 	const data = {}
 	if(ctx.query.msg) data.msg = ctx.query.msg
@@ -121,33 +163,48 @@ router.get('/login', async ctx => {
 router.post('/login', async ctx => {
 	try {
 		const body = ctx.request.body
+		console.log(body)
 		const user = await new User(dbName)
-		await user.login(body.user, body.pass)
+		ctx.session.userID = await user.login(body.user, body.pass)
 		ctx.session.authorised = true
+
+		console.log(ctx.session.userID)
+
 		return await ctx.redirect('gallery')
-		//return ctx.redirect('/?msg=you are now logged in...')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
 
+/**
+ * The user logout page.
+ *
+ * @name Logout Page
+ * @route {GET} /logout
+ */
 router.get('/logout', async ctx => {
 	ctx.session.authorised = null
 	ctx.redirect('/?msg=you are now logged out')
 })
 
 
-
+/**
+ * The page for users to add items.
+ *
+ * @name AddItem Page
+ * @route {GET} /addItem
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/addItem', async ctx => {
-		//if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		await ctx.render('addItem')
-		console.log(ctx.session.userID)
+	if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+	await ctx.render('addItem')
+	console.log(ctx.session.userID)
 })
 
 /**
  * The script to process new items added.
  *
- * @name addItem Script
+ * @name AddItem Script
  * @route {POST} /addItem
  */
 
@@ -157,35 +214,38 @@ router.post('/addItem', koaBody, async ctx => {
 		const body = ctx.request.body
 		console.log(body)
 
-		const {path, type} = ctx.request.files.avatar
+		var {path, type} = ctx.request.files.pic1
+		await fs.copy(path, `public/items/${body.title}1.png`)
 
-		await fs.copy(path, `public/items/${body.title}.png`)
+		var {path, type} = ctx.request.files.pic2
+		await fs.copy(path, `public/items/${body.title}2.png`)
 
-		const item = await new Item(dbName);
-		console.log(item);
+		var {path, type} = ctx.request.files.pic3
+		await fs.copy(path, `public/items/${body.title}3.png`)
+
+		const item = await new Item(dbName)
+		console.log(item)
 		console.log(ctx.session.userID)
 
 		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
-		await ctx.redirect('/gallery')	
+		await ctx.redirect('/gallery')
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
 
 /**
- * The script to process the currently clicked ite.
+ * Page to display items.
  *
- * @name items Script
- * @route {POST} /items
+ * @name Items Page
+ * @route {GET} /items/:index
+ * @authentication This route requires cookie-based authentication.
  */
 router.get('/items/:index', async ctx => {
 	try {
-		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-		//const data = {}
-		//if(ctx.query.msg) data.msg = ctx.query.msg
-		//console.log(ctx.session.userID)
+		const item = await new Item(dbName)
 
 		//Getting information on items from items DB
 		const sqlItems = `SELECT * FROM items where id = "${ctx.params.index}"`
@@ -193,23 +253,72 @@ router.get('/items/:index', async ctx => {
 		const itemData = await db.all(sqlItems)
 
 		const userID = itemData[0].userID
-		console.log(userID)
 		const sqlUser = `SELECT * FROM users where id = "${userID}"`
-
 		const userData = await db.all(sqlUser)
 		await db.close()
+		//checking how many pictures the item has
+		const images = []
+		for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
 
-		await ctx.render('items', {id: itemData, user: userData})
+		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
+		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
+		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
 
+
+/**
+ * The page to handle users adding interest.
+ *
+ * @name Interested Page
+ * @route {GET} /items/:index/interested
+ */
+router.get('/items/:index/interested', async ctx => {
+	try{
+		const item = await new Item(dbName)
+
+		await item.addInterestedUser(ctx.params.index, ctx.session.userID)
+
+		await ctx.redirect(`/items/${ctx.params.index}`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+/**
+ * The page to handle users removing interest.
+ *
+ * @name Uninterested Page
+ * @route {GET} /items/:index/uninterested
+ */
+router.get('/items/:index/uninterested', async ctx => {
+	try{
+		const item = await new Item(dbName)
+
+		await item.removeInterestedUser(ctx.params.index, ctx.session.userID)
+
+		await ctx.redirect(`/items/${ctx.params.index}`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+/**
+ * The page to display user information.
+ *
+ * @name User Page
+ * @route {GET} /user/:index
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/user/:index', async ctx => {
 	try {
-		console.log(ctx.params.index)
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		const item = await new Item(dbName)
+
 		//Getting information on specified user from items DB
 		const sqlUser = `SELECT * FROM users where id = "${ctx.params.index}"`
 		const sqlItems = `SELECT * FROM items where userID = "${ctx.params.index}"`
@@ -218,12 +327,63 @@ router.get('/user/:index', async ctx => {
 		const userItem = await db.all(sqlItems)
 		await db.close()
 
-		await ctx.render('user', {user: userData, item: userItem})
+		const userNumberInterest = await item.userNumberInterest(ctx.params.index)
+
+		await ctx.render('user', {user: userData, item: userItem, userNumberInterest: userNumberInterest})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
+
+/**
+ * The page to write a GDPR email.
+ *
+ * @name Email Page
+ * @route {GET} /items/:index/email
+ * @authentication This route requires cookie-based authentication.
+ */
+router.get('/items/:index/email', async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		await ctx.render('email', {item: ctx.params.index})
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+/**
+ * The script to process emails.
+ *
+ * @name Email Script
+ * @route {POST} /items/:index/email
+ */
+router.post('/items/:index/email', koaBody, async ctx => {
+	try {
+
+		const body = ctx.request.body
+
+		// get data from owner and interested user
+		const item = await new Item(dbName)
+		const user = await new User(dbName)
+
+		const ownerID = await item.getUserIDFromItemID(ctx.params.index)	//Get the user ID from the item ID
+		const interestedUser = await user.getDetails(ctx.session.userID)	//return all detials on the given user from the ID
+		const ownerDetails = await user.getDetails(ownerID)
+
+		const itemDetails = await item.getDetails(ctx.params.index)
+
+		// owner can't email themselves
+		await item.sendEmail(itemDetails, ownerDetails, interestedUser, body.subject, body.body, body.offer)
+
+		await ctx.redirect('/gallery')
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+
 //setting up release
 app.use(router.routes())
 module.exports = app.listen(port, async() => console.log(`listening on port ${port}`))
