@@ -314,15 +314,10 @@ router.get('/user/:index', async ctx => {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 
 		const item = await new Item(dbName)
+		const user = await new User(dbName)
 
-		//Getting information on specified user from items DB
-		const sqlUser = `SELECT * FROM users where id = "${ctx.params.index}"`
 		const userData = await user.getDetails(ctx.params.index)
-		const sqlItems = `SELECT * FROM items where userID = "${ctx.params.index}"`
-		const db = await Database.open(dbName)
-		const userData = await db.all(sqlUser)
-		const userItem = await db.all(sqlItems)
-		await db.close()
+		const userItem = await item.getUsersItems(ctx.params.index)
 
 		const userNumberInterest = await item.userNumberInterest(ctx.params.index)
 

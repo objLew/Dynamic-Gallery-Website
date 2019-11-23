@@ -300,4 +300,25 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Get all items associated with a specified user
+	 * @name getUsersItems
+	 * @param {number} userID
+	 * @returns Object with all items associated with the specified user
+	 */
+	async getUsersItems(userID) {
+		try{
+			if(userID === null || userID.length === 0) throw new Error('missing userID')
+
+			const sql = `SELECT * FROM items where userID = "${userID}"`
+			const userItems = await this.db.all(sql)
+			
+			if(Object.keys(userItems).length === 0) throw new Error('user does not exist')
+			
+			return userItems
+		} catch(err) {
+			throw err
+		}
+	}
+
 }

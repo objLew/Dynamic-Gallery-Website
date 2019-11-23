@@ -515,7 +515,7 @@ describe('sendEmail()', () => {
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 
-		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing item') )
 		done()
 	})
@@ -535,7 +535,7 @@ describe('sendEmail()', () => {
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
 
-		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing itemOwner') )
 		done()
 	})
@@ -719,7 +719,7 @@ describe('getUsersItems()', () => {
 
 
 		await expect( newItem.getUsersItems(null) )
-			.rejects.toEqual( Error('missing itemID') )
+			.rejects.toEqual( Error('missing userID') )
 		done()
 	})
 
