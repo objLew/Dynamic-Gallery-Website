@@ -290,6 +290,41 @@ module.exports = class items {
 	}
 
 	/**
+	 * Send an email to the seller of the item upon a successful paypal purchase.
+	 * @name sendPayPalEmail
+	 * @param {Object} item 
+	 * @param {Object} seller 
+	 * @param {Object} buyer 
+	 * @returns true if email is succesffuly send
+	 */
+	async sendPayPalEmail(item, seller, buyer) {
+		try{
+			if(item === null) throw new Error('missing item')
+			if(seller === null) throw new Error('missing seller')
+			if(buyer === null) throw new Error('missing buyer')
+
+			const mailOptions = {
+				from: `${buyer[0].email}`,
+				to: `${seller[0].email}`,
+				subject: `${buyer[0].user} bought your item: ${item[0].title}`,
+				text: `Buyers email: ${buyer[0].email}
+				\n Buyers username: ${buyer[0].user}
+				\n Buyers PayPal username: ${buyer[0].paypal}
+				\n Bought ttem: ${item[0].title}
+				\n Buyer paid original item price of: £${item[0].price}`
+			}
+
+			transporter.sendMail(mailOptions, (error, info) => {
+				//sending the email
+			})
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
 	 * Gets the id of the user that created the item
 	 * @name getUserIDFromItemID
 	 * @param {number} itemID

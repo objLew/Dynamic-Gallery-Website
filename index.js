@@ -290,6 +290,13 @@ router.get('/items/:index/uninterested', async ctx => {
 	}
 })
 
+/**
+ * The page to handles the PayPal interface
+ *
+ * @name paypal Page
+ * @route {GET} /items/:index/uninterested
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/items/:index/paypal', async ctx => {
 	try{
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
@@ -314,14 +321,24 @@ router.get('/items/:index/paypal', async ctx => {
 	}
 })
 
+/**
+ * The script to process the purchase of an item through the paypal interface.
+ *
+ * @name paypal Script
+ * @route {POST} /items/:index/paypal
+ */
 router.post('/items/:index/paypal', koaBody, async ctx => {
 	try {
 		const item = await new Item(dbName)
-		
+		const user = await new User(dbName)
+
 		//Getting information on items from items DB
 		const itemData = await item.getDetails(ctx.params.index)
+		const sellerData = await user.getDetails(itemData[0].userID)
+		const buyerData = await user.getDetails(ctx.session.userID)
 
 		item.markAsSold(itemData[0].id, ctx.session.userID, ctx.params.index)	//making the transaction offical.
+		item.sendPayPalEmail(itemData, sellerData, buyerData)
 
 		await ctx.redirect(`/gallery?msg=thank you for your purchase of item number: ${ctx.params.index}, ${itemData[0].title}`)
 	} catch(err) {
