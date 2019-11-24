@@ -178,7 +178,6 @@ describe('isSold()', () => {
 		//setup of item
 		const newItem = await new Item()
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-		await newItem.markAsSold(1)
 
 		const markSold = await newItem.isSold(1)
 
@@ -192,6 +191,8 @@ describe('isSold()', () => {
 		//setup of item
 		const newItem = await new Item()
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await newItem.markAsSold(1, 2, 1)
 
 		const markSold = await newItem.isSold(1)
 
@@ -807,6 +808,19 @@ describe('allItemWithInterest()', () => {
 		const result = await item.allItemWithInterest()
 
 		expect(result[0].interest).toBe(1)
+		done()
+	})
+
+	test('no interest', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await item.allItemWithInterest()
+
+		expect(result[0].interest).toBe(0)
 		done()
 	})
 

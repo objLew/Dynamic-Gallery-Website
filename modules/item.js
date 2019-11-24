@@ -90,7 +90,7 @@ module.exports = class items {
 			await this.db.run(sql)
 
 			//updating item to be sold
-			sql = 'UPDATE items SET sold = true WHERE id = ?', [itemID]
+			sql = `UPDATE items SET sold = true WHERE id = ${itemID}`
 			await this.db.run(sql)
 
 			return true
@@ -99,7 +99,33 @@ module.exports = class items {
 		}
 	}
 
-	
+	/**
+	 *	Checks if an item is sold
+	 * @name isSold
+	 * @param {number} itemID
+	 * @returns true if the item is sold, false otherwise
+	 */
+	async isSold(itemID) {
+		try {
+			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
+
+			const sql = `SELECT sold FROM items WHERE id=${itemID};`
+			const data = await this.db.get(sql)
+			
+			//check for undefined/empty
+			if(!data || Object.keys(data).length === 0) throw new Error('item does not exist')
+			
+			//as we get a string, convert this to an explicit true/false
+			if(data.sold == "false") {
+				return false
+			}
+			else {
+				return true
+			}
+		} catch(err) {
+			throw err
+		}
+	}
 
 	/**
 	 * Checks if the user is interested in an item
