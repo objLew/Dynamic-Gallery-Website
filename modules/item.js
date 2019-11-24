@@ -7,6 +7,9 @@
 // const fs = require('fs-extra')
 //const mime = require('mime-types')
 
+const maxImages = 3
+const fs = require('fs-extra')
+
 const sqlite = require('sqlite-async')
 const nodemailer = require('nodemailer')
 
@@ -300,4 +303,64 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Get all items associated with a specified user
+	 * @name getUsersItems
+	 * @param {number} userID
+	 * @returns Object with all items associated with the specified user
+	 */
+	async getUsersItems(userID) {
+		try{
+			if(userID === null || userID.length === 0) throw new Error('missing userID')
+
+			const sql = `SELECT * FROM items where userID = "${userID}"`
+			const userItems = await this.db.all(sql)
+			
+			if(Object.keys(userItems).length === 0) throw new Error('user does not exist')
+			
+			return userItems
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Checks how many images exist
+	 * @name getImages
+	 * @param {Object} itemData 
+	 * @returns an array of image locations
+	 */
+	async getImages(itemData){
+		try{
+			const images = []
+			for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
+
+			return images
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Gets the interest from users for each item
+	 * @name allItemWithInterest
+	 * @returns an array with
+	 */
+	async allItemWithInterest(){
+		try{
+			const sql = 'SELECT * FROM items;'
+			const data = await this.db.all(sql)
+
+			if(Object.keys(data).length === 0) throw new Error('no items exist')
+
+			const dataSize = Object.keys(data).length
+			for (let i = 0; i < dataSize; i++) {
+				data[i].interest = await this.numberOfInterested(data[i].id)
+			}
+			
+			return data
+		} catch(err) {
+			throw err
+		}
+	}
 }

@@ -515,7 +515,7 @@ describe('sendEmail()', () => {
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 
-		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing item') )
 		done()
 	})
@@ -535,7 +535,7 @@ describe('sendEmail()', () => {
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
 
-		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing itemOwner') )
 		done()
 	})
@@ -676,6 +676,109 @@ describe('getDetails()', () => {
 
 		await expect( newItem.getDetails(5) )
 			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+})
+
+describe('getUsersItems()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.getUsersItems(1)
+
+		expect(result[0].title).toBe('monalisa')
+		done()
+	})
+
+	test('get all items with multiple items', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'TWOmonalisa', 2000, 'TWOnice', 'TWOvery nice')
+		await newItem.addItem(2, 'THREEmonalisa', 3000, 'THREEnice', 'THREE very nice')
+
+		const result = await newItem.getUsersItems(1)
+
+		expect(result[1].title).toBe('TWOmonalisa')
+		done()
+	})
+
+	test('invalid userID', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		await expect( newItem.getUsersItems(null) )
+			.rejects.toEqual( Error('missing userID') )
+		done()
+	})
+
+	test('non existent user', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await expect( newItem.getUsersItems(5) )
+			.rejects.toEqual( Error('user does not exist') )
+		done()
+	})
+
+})
+
+
+describe('allItemWithInterest()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		item.addInterestedUser(1, 1)
+
+		const result = await item.allItemWithInterest()
+
+		expect(result[0].interest).toBe(1)
+		done()
+	})
+
+	test('get all items with multiple items', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await item.addItem(1, 'TWOmonalisa', 2000, 'TWOnice', 'TWOvery nice')
+		await item.addItem(2, 'THREEmonalisa', 3000, 'THREEnice', 'THREE very nice')
+
+		item.addInterestedUser(2, 1)
+		item.addInterestedUser(2, 2)
+
+		const result = await item.allItemWithInterest()
+
+		expect(result[1].interest).toBe(2)
+		done()
+	})
+
+	test('non existent items', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await expect( item.allItemWithInterest() )
+			.rejects.toEqual( Error('no items exist') )
 		done()
 	})
 
