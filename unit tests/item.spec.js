@@ -171,6 +171,62 @@ describe('markAsSold()', () => {
 
 })
 
+describe('isSold()', () => {
+	test('item not sold', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.markAsSold(1)
+
+		const markSold = await newItem.isSold(1)
+
+		expect(markSold).toBe(false)
+		done()
+	})
+
+	test('item is sold', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const markSold = await newItem.isSold(1)
+
+		expect(markSold).toBe(true)
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		await expect( newItem.isSold(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('item does not exist', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+
+		await expect( newItem.isSold(1) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+
+})
+
 describe('isInterested()', () => {
 	test('user is already interested', async done => {
 		expect.assertions(1)

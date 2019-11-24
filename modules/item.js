@@ -99,6 +99,8 @@ module.exports = class items {
 		}
 	}
 
+	
+
 	/**
 	 * Checks if the user is interested in an item
 	 * @name isInterested
@@ -246,7 +248,7 @@ module.exports = class items {
 				subject: `${subject}`,
 				text: `From: ${interestedUser[0].email}
 				\n Queried Item: ${item[0].title}
-				\n Original item price: ${item[0].price}
+				\n Original item price: £${item[0].price}
 				\n ${interestedUser[0].user}'s message: ${text}
 				\n Their offer: £${offer}`
 			}
@@ -313,7 +315,7 @@ module.exports = class items {
 		try{
 			if(userID === null || userID.length === 0) throw new Error('missing userID')
 
-			const sql = `SELECT * FROM items where userID = "${userID}"`
+			const sql = `SELECT * FROM items WHERE userID = "${userID}"`
 			const userItems = await this.db.all(sql)
 
 			if(Object.keys(userItems).length === 0) throw new Error('user does not exist')
@@ -363,4 +365,5 @@ module.exports = class items {
 			throw err
 		}
 	}
+
 }

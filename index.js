@@ -292,9 +292,17 @@ router.get('/items/:index/uninterested', async ctx => {
 router.get('/items/:index/paypal', async ctx => {
 	try{
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
-
 		const item = await new Item(dbName)
 		const user = await new User(dbName)
+
+		//Getting information on items from items DB
+		const itemData = await item.getDetails(ctx.params.index)
+		const sellerData = await user.getDetails(itemData[0].userID)
+		const buyerData = await user.getDetails(ctx.session.userID)
+		//getting the images for the item
+		const images = await item.getImages(itemData)
+
+		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
 
 
 		await ctx.render(`paypal`)
