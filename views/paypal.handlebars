@@ -10,17 +10,33 @@
 	</head>
 	<body>
 		<h1>Paypal</h1>
-		<form action="/addItem" enctype="multipart/form-data" method="post">
-			<div class="title">{{this.title}}</div>
-			<div class="price">£{{this.price}}</div>
-			<div class="shortDesc">Short description: {{this.shortDesc}}</div>
-			<div class="longDesc">Long description: {{this.longDesc}}</div>
 
-			<img src='../avatars/{{this.user}}.png' alt="../avatars/avatar.png" width="75" height="50">
-			<div class="name">Username: {{this.user}}</div>	
+        {{#each item}}
+        <p>Payment for {{this.title}}</p>
+        {{/each}}
 
+        {{#each buyer}}
+        <p>From your PayPal account: {{this.paypal}}</p>
+        {{/each}}
+
+        {{#each seller}}
+        <p>To PayPal: {{this.paypal}}</p>
+        {{/each}}
+
+        {{#each item}}
+        <p>Total: £{{this.price}}</p>
+        {{/each}}
+
+        {{#each item}}
+		<form action="/items/{{this.id}}/paypal" enctype="multipart/form-data" method="post">
 			<p><input type="submit" value="Complete PayPal Payment"></p>
 		</form>
+        {{/each}}
+
 		<p><a href="/gallery">back to home</a></p>
+        {{#each item}}
+        <p><a href="/items/{{this.id}}">cancel</a></p>
+        {{/each}}
+
 	</body>
 </html>

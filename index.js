@@ -69,7 +69,8 @@ router.get('/gallery', async ctx => {
 
 		const data = await item.allItemWithInterest()
 		const auth = ctx.session.authorised
-
+		if(ctx.query.msg) data.msg = ctx.query.msg
+		
 		await ctx.render('gallery', {data: data, auth: auth})
 
 	} catch(err) {
@@ -295,28 +296,34 @@ router.get('/items/:index/paypal', async ctx => {
 		const item = await new Item(dbName)
 		const user = await new User(dbName)
 
+		//check if item is sold
+		if(await item.isSold(ctx.params.index))	return ctx.redirect(`/gallery?msg=item number ${ctx.params.index} is sold`)
+		
 		//Getting information on items from items DB
 		const itemData = await item.getDetails(ctx.params.index)
 		const sellerData = await user.getDetails(itemData[0].userID)
 		const buyerData = await user.getDetails(ctx.session.userID)
+
 		//getting the images for the item
 		const images = await item.getImages(itemData)
 
-		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
 
-
-		await ctx.render(`paypal`)
+		await ctx.render(`paypal`, {item: itemData, seller: sellerData, buyer: buyerData, images: images})
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
 })
 
-router.post('/items/:index/email', koaBody, async ctx => {
+router.post('/items/:index/paypal', koaBody, async ctx => {
 	try {
+		const item = await new Item(dbName)
+		
+		//Getting information on items from items DB
+		const itemData = await item.getDetails(ctx.params.index)
 
-		const body = ctx.request.body
+		item.markAsSold(itemData[0].id, ctx.session.userID, ctx.params.index)	//making the transaction offical.
 
-		await ctx.redirect('/gallery')
+		await ctx.redirect(`/gallery?msg=thank you for your purchase of item number: ${ctx.params.index}, ${itemData[0].title}`)
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}

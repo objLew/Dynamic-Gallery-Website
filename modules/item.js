@@ -116,7 +116,7 @@ module.exports = class items {
 			if(!data || Object.keys(data).length === 0) throw new Error('item does not exist')
 			
 			//as we get a string, convert this to an explicit true/false
-			if(data.sold == "false") {
+			if(data.sold === "false" || data.sold === 0) {
 				return false
 			}
 			else {
