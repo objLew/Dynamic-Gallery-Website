@@ -738,7 +738,7 @@ describe('getUsersItems()', () => {
 })
 
 
-describe('interestPerItem()', () => {
+describe('allItemWithInterest()', () => {
 	test('appropriate setup', async done => {
 		expect.assertions(1)
 		//setup of item
@@ -748,9 +748,9 @@ describe('interestPerItem()', () => {
 
 		item.addInterestedUser(1, 1)
 
-		const result = await item.interestPerItem()
+		const result = await item.allItemWithInterest()
 
-		expect(result[0]).toBe(1)
+		expect(result[0].interest).toBe(1)
 		done()
 	})
 
@@ -766,9 +766,9 @@ describe('interestPerItem()', () => {
 		item.addInterestedUser(2, 1)
 		item.addInterestedUser(2, 2)
 
-		const result = await item.interestPerItem()
+		const result = await item.allItemWithInterest()
 
-		expect(result[1]).toBe(2)
+		expect(result[1].interest).toBe(2)
 		done()
 	})
 
@@ -777,7 +777,7 @@ describe('interestPerItem()', () => {
 		//setup of item
 		const item = await new Item()
 
-		await expect( item.interestPerItem() )
+		await expect( item.allItemWithInterest() )
 			.rejects.toEqual( Error('no items exist') )
 		done()
 	})

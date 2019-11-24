@@ -67,18 +67,8 @@ router.get('/gallery', async ctx => {
 	try {
 		const item = await new Item(dbName)
 
-		//Getting information on items from items DB
-		const sql = 'SELECT * FROM items;'
-		const db = await Database.open(dbName)
-		const data = await db.all(sql)
-		await db.close()
-
+		const data = await item.allItemWithInterest()
 		const auth = ctx.session.authorised
-		//getting the interest for each item
-		const dataSize = Object.keys(data).length
-		for (let i = 0; i < dataSize; i++) {
-			data[i].interest = await item.numberOfInterested(data[i].id)
-		}
 
 		await ctx.render('gallery', {data: data, auth: auth})
 

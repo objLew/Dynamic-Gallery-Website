@@ -341,4 +341,26 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Gets the interest from users for each item
+	 * @name allItemWithInterest
+	 * @returns an array with
+	 */
+	async allItemWithInterest(){
+		try{
+			const sql = 'SELECT * FROM items;'
+			const data = await this.db.all(sql)
+
+			if(Object.keys(data).length === 0) throw new Error('no items exist')
+
+			const dataSize = Object.keys(data).length
+			for (let i = 0; i < dataSize; i++) {
+				data[i].interest = await this.numberOfInterested(data[i].id)
+			}
+			
+			return data
+		} catch(err) {
+			throw err
+		}
+	}
 }
