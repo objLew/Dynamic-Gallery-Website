@@ -241,7 +241,7 @@ router.get('/items/:index', async ctx => {
 		const userData = await user.getDetails(userID)
 
 		//getting the images for the item
-		const images = await item.getImages(itemData);
+		const images = await item.getImages(itemData)
 
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)

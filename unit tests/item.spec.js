@@ -783,3 +783,46 @@ describe('allItemWithInterest()', () => {
 	})
 
 })
+
+/*
+describe('getImages()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		const itemDetails = await item.getDetails(1)
+
+		const result = await item.getImages(itemDetails)
+
+		expect().toBe()
+		done()
+	})
+
+	test('get all items with multiple images', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		const itemDetails = await item.getDetails(1)
+
+		const result = await item.getImages(itemDetails)
+
+		expect().toBe()
+		done()
+	})
+
+	test('no images', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await expect( item.allItemWithInterest() )
+			.rejects.toEqual( Error('no images exist') )
+		done()
+	})
+
+})
+*/

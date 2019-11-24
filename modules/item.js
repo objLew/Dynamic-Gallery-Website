@@ -315,9 +315,9 @@ module.exports = class items {
 
 			const sql = `SELECT * FROM items where userID = "${userID}"`
 			const userItems = await this.db.all(sql)
-			
+
 			if(Object.keys(userItems).length === 0) throw new Error('user does not exist')
-			
+
 			return userItems
 		} catch(err) {
 			throw err
@@ -327,10 +327,10 @@ module.exports = class items {
 	/**
 	 * Checks how many images exist
 	 * @name getImages
-	 * @param {Object} itemData 
+	 * @param {Object} itemData
 	 * @returns an array of image locations
 	 */
-	async getImages(itemData){
+	async getImages(itemData) {
 		try{
 			const images = []
 			for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
@@ -344,9 +344,9 @@ module.exports = class items {
 	/**
 	 * Gets the interest from users for each item
 	 * @name allItemWithInterest
-	 * @returns an array with
+	 * @returns an array with all items and their interest level
 	 */
-	async allItemWithInterest(){
+	async allItemWithInterest() {
 		try{
 			const sql = 'SELECT * FROM items;'
 			const data = await this.db.all(sql)
@@ -357,7 +357,7 @@ module.exports = class items {
 			for (let i = 0; i < dataSize; i++) {
 				data[i].interest = await this.numberOfInterested(data[i].id)
 			}
-			
+
 			return data
 		} catch(err) {
 			throw err
