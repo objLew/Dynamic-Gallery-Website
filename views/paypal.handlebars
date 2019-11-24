@@ -1,0 +1,42 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Paypal</title>
+		<meta name="description" content="complete a paypal purchase">
+		<meta name="author" content="Lewis Lovette">
+		<link href="style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<h1>Paypal</h1>
+
+        {{#each item}}
+        <p>Payment for {{this.title}}</p>
+        {{/each}}
+
+        {{#each buyer}}
+        <p>From your PayPal account: {{this.paypal}}</p>
+        {{/each}}
+
+        {{#each seller}}
+        <p>To PayPal: {{this.paypal}}</p>
+        {{/each}}
+
+        {{#each item}}
+        <p>Total: £{{this.price}}</p>
+        {{/each}}
+
+        {{#each item}}
+		<form action="/items/{{this.id}}/paypal" enctype="multipart/form-data" method="post">
+			<p><input type="submit" value="Complete PayPal Payment"></p>
+		</form>
+        {{/each}}
+
+		<p><a href="/gallery">back to home</a></p>
+        {{#each item}}
+        <p><a href="/items/{{this.id}}">cancel</a></p>
+        {{/each}}
+
+	</body>
+</html>

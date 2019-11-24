@@ -171,6 +171,63 @@ describe('markAsSold()', () => {
 
 })
 
+describe('isSold()', () => {
+	test('item not sold', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const markSold = await newItem.isSold(1)
+
+		expect(markSold).toBe(false)
+		done()
+	})
+
+	test('item is sold', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await newItem.markAsSold(1, 2, 1)
+
+		const markSold = await newItem.isSold(1)
+
+		expect(markSold).toBe(true)
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		await expect( newItem.isSold(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('item does not exist', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+
+		await expect( newItem.isSold(1) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+
+})
+
 describe('isInterested()', () => {
 	test('user is already interested', async done => {
 		expect.assertions(1)
@@ -625,6 +682,92 @@ describe('sendEmail()', () => {
 
 })
 
+describe('sendPayPalEmail()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		const sellerDetails = await account.getDetails(1)
+		const buyerDetails = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+
+		const result = await newItem.sendPayPalEmail(itemDetails, sellerDetails, buyerDetails)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('invalid item', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const sellerDetails = await account.getDetails(1)
+		const buyerDetails = await account.getDetails(2)
+
+		await expect( newItem.sendPayPalEmail(null, sellerDetails, buyerDetails) )
+			.rejects.toEqual( Error('missing item') )
+		done()
+	})
+
+	test('invalid owner ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const buyerDetails = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+
+		await expect( newItem.sendPayPalEmail(itemDetails, null, buyerDetails) )
+			.rejects.toEqual( Error('missing seller') )
+		done()
+	})
+
+	test('invalid interested user ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+
+		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const sellerDetails = await account.getDetails(1)
+		const itemDetails = await newItem.getDetails(1)
+
+		await expect( newItem.sendPayPalEmail(itemDetails, sellerDetails, null) )
+			.rejects.toEqual( Error('missing buyer') )
+		done()
+	})
+
+})
+
 describe('getDetails()', () => {
 	test('appropriate setup', async done => {
 		expect.assertions(1)
@@ -739,21 +882,6 @@ describe('getUsersItems()', () => {
 
 
 describe('allItemWithInterest()', () => {
-	test('appropriate setup', async done => {
-		expect.assertions(1)
-		//setup of item
-		const item = await new Item()
-
-		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-
-		item.addInterestedUser(1, 1)
-
-		const result = await item.allItemWithInterest()
-
-		expect(result[0].interest).toBe(1)
-		done()
-	})
-
 	test('get all items with multiple items', async done => {
 		expect.assertions(1)
 		//setup of item
@@ -769,6 +897,19 @@ describe('allItemWithInterest()', () => {
 		const result = await item.allItemWithInterest()
 
 		expect(result[1].interest).toBe(2)
+		done()
+	})
+
+	test('no interest', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await item.allItemWithInterest()
+
+		expect(result[0].interest).toBe(0)
 		done()
 	})
 
