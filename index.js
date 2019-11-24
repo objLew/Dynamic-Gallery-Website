@@ -289,6 +289,31 @@ router.get('/items/:index/uninterested', async ctx => {
 	}
 })
 
+router.get('/items/:index/paypal', async ctx => {
+	try{
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		const item = await new Item(dbName)
+		const user = await new User(dbName)
+
+
+		await ctx.render(`paypal`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+router.post('/items/:index/email', koaBody, async ctx => {
+	try {
+
+		const body = ctx.request.body
+
+		await ctx.redirect('/gallery')
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
 /**
  * The page to display user information.
  *

@@ -1,0 +1,26 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Paypal</title>
+		<meta name="description" content="complete a paypal purchase">
+		<meta name="author" content="Lewis Lovette">
+		<link href="style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<h1>Paypal</h1>
+		<form action="/addItem" enctype="multipart/form-data" method="post">
+			<div class="title">{{this.title}}</div>
+			<div class="price">£{{this.price}}</div>
+			<div class="shortDesc">Short description: {{this.shortDesc}}</div>
+			<div class="longDesc">Long description: {{this.longDesc}}</div>
+
+			<img src='../avatars/{{this.user}}.png' alt="../avatars/avatar.png" width="75" height="50">
+			<div class="name">Username: {{this.user}}</div>	
+
+			<p><input type="submit" value="Complete Payment"></p>
+		</form>
+		<p><a href="/gallery">back to home</a></p>
+	</body>
+</html>
