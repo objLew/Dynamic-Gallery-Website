@@ -41,8 +41,6 @@ const dbName = 'website.db'
 
 const fs = require('fs-extra')
 
-const maxImages = 3
-
 
 /**
  * The secure home page.
