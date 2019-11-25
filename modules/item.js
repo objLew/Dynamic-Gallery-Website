@@ -469,5 +469,60 @@ module.exports = class items {
 		}
 	}
 
-	
+	async getItemsToUpdate(itemData, body){
+		try {
+			
+			const title = body.title 
+			const price = body.price 
+			const shortDesc = body.shortDesc 
+			const longDesc = body.longDesc
+			
+
+			if(!(title === null || title.length === 0)) itemData[0].title = title
+			if(!(shortDesc === null || shortDesc.length === 0)) itemData[0].shortDesc = shortDesc
+			if(!(longDesc === null || longDesc.length === 0)) itemData[0].longDesc = longDesc
+			if(price) itemData[0].price = price
+
+			
+			return itemData
+
+		} catch(err) {
+			throw err
+		}
+			
+	}
+
+
+	async updateItem(itemID, body){
+		try {
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			const itemData = await this.getDetails(itemID)
+			const originalName = [{title: itemData[0].title}]
+
+			if(Object.keys(itemData).length === 0) throw new Error('item does not exist')
+
+			const newItemData = await this.getItemsToUpdate(itemData, body)
+
+			const sql = `UPDATE items SET 
+				price = ${newItemData[0].price}, title = "${newItemData[0].title}",
+				shortDesc = "${newItemData[0].shortDesc}", longDesc = "${newItemData[0].longDesc}" 
+				WHERE id = ${newItemData[0].id}`
+			await this.db.run(sql)
+
+			const images = await this.getImages(originalName)
+			const changeImages = images.length
+			
+			for(let i = 1; i <= changeImages; i++){
+				fs.renameSync(`public/items/${originalName[0].title}${i}_small.png`, `public/items/${newItemData[0].title}${i}_small.png`)
+				fs.renameSync(`public/items/${originalName[0].title}${i}_big.png`, `public/items/${newItemData[0].title}${i}_big.png`)
+			}
+
+		
+			return true;
+		} catch(err) {
+			throw err
+		}
+	}
+
 }
