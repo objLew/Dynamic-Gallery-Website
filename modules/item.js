@@ -111,15 +111,14 @@ module.exports = class items {
 
 			const sql = `SELECT sold FROM items WHERE id=${itemID};`
 			const data = await this.db.get(sql)
-			
+
 			//check for undefined/empty
 			if(!data || Object.keys(data).length === 0) throw new Error('item does not exist')
-			
+
 			//as we get a string, convert this to an explicit true/false
-			if(data.sold === "false" || data.sold === 0) {
+			if(data.sold === 'false' || data.sold === 0) {
 				return false
-			}
-			else {
+			} else {
 				return true
 			}
 		} catch(err) {
@@ -292,9 +291,9 @@ module.exports = class items {
 	/**
 	 * Send an email to the seller of the item upon a successful paypal purchase.
 	 * @name sendPayPalEmail
-	 * @param {Object} item 
-	 * @param {Object} seller 
-	 * @param {Object} buyer 
+	 * @param {Object} item
+	 * @param {Object} seller
+	 * @param {Object} buyer
 	 * @returns true if email is succesffuly send
 	 */
 	async sendPayPalEmail(item, seller, buyer) {
@@ -420,6 +419,53 @@ module.exports = class items {
 			for (let i = 0; i < dataSize; i++) {
 				data[i].interest = await this.numberOfInterested(data[i].id)
 			}
+
+			return data
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * 
+	 * @param {object} data 
+	 * @returns specific items with interest levels on each
+	 */
+	async givenItemsWithInterest(data) {
+		try{
+
+			if(Object.keys(data).length === 0) throw new Error('no items exist')
+
+			const dataSize = Object.keys(data).length
+			for (let i = 0; i < dataSize; i++) {
+				data[i].interest = await this.numberOfInterested(data[i].id)
+			}
+
+			return data
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Global search for items of interest - checks the title, short and long descriptions
+	 * @name search
+	 * @param {string} querystring 
+	 * @returns 
+	 */
+	async search(querystring) {
+		try {
+			if(querystring === null || querystring.length === 0) throw new Error('missing querystring')
+
+			console.log(querystring)
+
+			const sql = `SELECT * FROM items WHERE upper(title) LIKE "%${querystring}%" OR upper(shortDesc) LIKE "%${querystring}%" OR upper(longDesc) LIKE "%${querystring}%"`
+			const data = await this.db.all(sql)
+
+			console.log(data)
+
+			if(Object.keys(data).length === 0) throw new Error('no items exist for this search')
+
 
 			return data
 		} catch(err) {

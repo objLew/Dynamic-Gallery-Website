@@ -16,7 +16,6 @@ const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
 
-const Database = require('sqlite-async')
 //const stat = require('koa-static')
 //const handlebars = require('koa-hbs-renderer')
 //const jimp = require('jimp')
@@ -65,12 +64,13 @@ router.get('/', async ctx => {
  */
 router.get('/gallery', async ctx => {
 	try {
+		console.log('it went to get :)')
 		const item = await new Item(dbName)
 
 		const data = await item.allItemWithInterest()
 		const auth = ctx.session.authorised
 		if(ctx.query.msg) data.msg = ctx.query.msg
-		
+
 		await ctx.render('gallery', {data: data, auth: auth})
 
 	} catch(err) {
@@ -78,18 +78,32 @@ router.get('/gallery', async ctx => {
 	}
 })
 
-// CHANGE TO /**
-/*
- * The script to process new user registrations.
+/**
+ * The script to process searches on the gallery page.
  *
  * @name Gallery Script
  * @route {POST} /gallery
  *
- * router.post('/gallery', koaBody, async ctx => {
- *	//implement post
- * })
  */
+router.post('/gallery', async ctx => {
+	try {
+		if(ctx.query.msg) data.msg = ctx.query.msg
+		const auth = ctx.session.authorised
 
+		const body = ctx.request.body
+		console.log(body.search)
+
+		const item = await new Item(dbName)
+
+		const data = await item.search(body.search)
+
+		console.log(data)
+
+		await ctx.render('gallery', {data: data, auth: auth})
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
 
 /**
  * The user registration page.
@@ -305,7 +319,7 @@ router.get('/items/:index/paypal', async ctx => {
 
 		//check if item is sold
 		if(await item.isSold(ctx.params.index))	return ctx.redirect(`/gallery?msg=item number ${ctx.params.index} is sold`)
-		
+
 		//Getting information on items from items DB
 		const itemData = await item.getDetails(ctx.params.index)
 		const sellerData = await user.getDetails(itemData[0].userID)
@@ -315,7 +329,7 @@ router.get('/items/:index/paypal', async ctx => {
 		const images = await item.getImages(itemData)
 
 
-		await ctx.render(`paypal`, {item: itemData, seller: sellerData, buyer: buyerData, images: images})
+		await ctx.render('paypal', {item: itemData, seller: sellerData, buyer: buyerData, images: images})
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}
