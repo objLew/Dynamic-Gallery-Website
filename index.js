@@ -442,6 +442,31 @@ router.post('/items/:index/edit', koaBody, async ctx => {
 })
 
 
+router.get('/items/:index/delete', async ctx => {
+	try{
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+
+		await ctx.render('delete', {itemID: ctx.params.index})
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+router.post('/items/:index/delete', koaBody, async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		const item = await new Item(dbName)
+		await item.deleteItem(ctx.params.index)
+
+		await ctx.redirect(`/gallery?msg=item ${ctx.params.index} deleted`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+
 /**
  * The page to display user information.
  *
