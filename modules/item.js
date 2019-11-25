@@ -427,7 +427,7 @@ module.exports = class items {
 	}
 
 	/**
-	 * 
+	 * Gets the interest level for a specified set od
 	 * @param {object} data 
 	 * @returns specific items with interest levels on each
 	 */
@@ -451,18 +451,14 @@ module.exports = class items {
 	 * Global search for items of interest - checks the title, short and long descriptions
 	 * @name search
 	 * @param {string} querystring 
-	 * @returns 
+	 * @returns returns all items with the searched string
 	 */
 	async search(querystring) {
 		try {
 			if(querystring === null || querystring.length === 0) throw new Error('missing querystring')
 
-			console.log(querystring)
-
 			const sql = `SELECT * FROM items WHERE upper(title) LIKE "%${querystring}%" OR upper(shortDesc) LIKE "%${querystring}%" OR upper(longDesc) LIKE "%${querystring}%"`
 			const data = await this.db.all(sql)
-
-			console.log(data)
 
 			if(Object.keys(data).length === 0) throw new Error('no items exist for this search')
 

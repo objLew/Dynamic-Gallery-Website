@@ -925,6 +925,81 @@ describe('allItemWithInterest()', () => {
 
 })
 
+describe('search()', () => {
+	test('succesful search', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.search('nice')
+
+		expect(result[0].title).toBe('monalisa')
+		done()
+	})
+
+	test('succesful search with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const result = await newItem.search('nice')
+
+		expect(result[1].title).toBe('monalisa2')
+		done()
+	})
+
+	test('invalid querystring', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.search('') )
+			.rejects.toEqual( Error('missing querystring') )
+		done()
+	})
+
+})
+
+describe('givenItemsWithInterest()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemDetails = await newItem.getDetails(1)
+
+		const result = await newItem.givenItemsWithInterest(itemDetails)
+
+		expect(result[0].interest).toBe(0)
+		done()
+	})
+
+	test('appropriate setup with interest', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemDetails = await newItem.getDetails(1)
+		await newItem.addInterestedUser(1, 1)
+
+		const result = await newItem.givenItemsWithInterest(itemDetails)
+
+		expect(result[0].interest).toBe(1)
+		done()
+	})
+
+})
+
 /*
 describe('getImages()', () => {
 	test('appropriate setup', async done => {
