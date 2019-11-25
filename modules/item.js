@@ -395,7 +395,7 @@ module.exports = class items {
 	async getImages(itemData) {
 		try{
 			const images = []
-			for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
+			for(let i = 1; i <= maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}_small.png`)) images.push(itemData[0].title+i)
 
 			return images
 		} catch(err) {
@@ -428,7 +428,7 @@ module.exports = class items {
 
 	/**
 	 * Gets the interest level for a specified set od
-	 * @param {object} data 
+	 * @param {object} data
 	 * @returns specific items with interest levels on each
 	 */
 	async givenItemsWithInterest(data) {
@@ -450,7 +450,7 @@ module.exports = class items {
 	/**
 	 * Global search for items of interest - checks the title, short and long descriptions
 	 * @name search
-	 * @param {string} querystring 
+	 * @param {string} querystring
 	 * @returns returns all items with the searched string
 	 */
 	async search(querystring) {

@@ -15,6 +15,13 @@ const staticDir = require('koa-static')
 const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
+const sharp = require('sharp')
+// @ts-ignore
+const watermark = require('image-watermark')
+
+const path = require('path')
+
+//const imaginary = require('imaginary')
 
 //const stat = require('koa-static')
 //const handlebars = require('koa-hbs-renderer')
@@ -207,23 +214,22 @@ router.get('/addItem', async ctx => {
  * @route {POST} /addItem
  */
 
+// eslint-disable-next-line complexity
+// eslint-disable-next-line max-lines-per-function
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
 		const body = ctx.request.body
 		const item = await new Item(dbName)
 
-		var {path, type} = ctx.request.files.pic1
-		await fs.copy(path, `public/items/${body.title}1.png`)
+		const imagePath = await path.resolve(__dirname, 'public/items/hini1_big.png')
+		if(fs.existsSync(imagePath)) {
+			console.log('I"m about to KMS')
+			await watermark.embedWatermark(imagePath, {'text': 'sample watermark'})
+			console.log('Unable to kms :(')
+		}
 
-		var {path, type} = ctx.request.files.pic2
-		await fs.copy(path, `public/items/${body.title}2.png`)
-
-		var {path, type} = ctx.request.files.pic3
-		await fs.copy(path, `public/items/${body.title}3.png`)
-
-
-		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
+		//await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
 		await ctx.redirect('/gallery')
 	} catch(err) {
