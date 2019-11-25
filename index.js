@@ -86,7 +86,23 @@ router.get('/gallery', async ctx => {
  *
  */
 router.post('/gallery', async ctx => {
+	try {
+		if(ctx.query.msg) data.msg = ctx.query.msg
+		const auth = ctx.session.authorised
 
+		const body = ctx.request.body
+		console.log(body.search)
+
+		const item = await new Item(dbName)
+
+		const data = await item.search(body.search)
+
+		console.log(data)
+
+		await ctx.render('gallery', {data: data, auth: auth})
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
 })
 
 /**
