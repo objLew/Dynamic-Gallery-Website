@@ -295,14 +295,16 @@ router.get('/items/:index', async ctx => {
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
 
-		let edit = true
+		let edit = false
+		let deleteItem = false
 		if(itemData[0].userID === ctx.session.userID) {
 			edit = true
-		} else{
-			edit = false
+			if(await item.isSold(itemData[0].id)) {
+				deleteItem = true
+			}
 		}
 
-		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested, edit: edit})
+		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested, edit: edit, deleteItem: deleteItem})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -438,6 +440,7 @@ router.post('/items/:index/edit', koaBody, async ctx => {
 		await ctx.render('error', {message: err.message})
 	}
 })
+
 
 /**
  * The page to display user information.

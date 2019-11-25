@@ -72,6 +72,14 @@
 			{{/each}}
 		{{/if}}
 
+		{{#if deleteItem}}
+			{{#each item}}
+				<form action="/items/{{this.id}}/delete">
+					<button type="submit" value="delete">delete this item</button>
+				</form>
+			{{/each}}
+		{{/if}}
+
 		
 	</body>
 </html>

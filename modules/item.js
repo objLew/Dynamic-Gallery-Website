@@ -432,19 +432,13 @@ module.exports = class items {
 	 * @returns specific items with interest levels on each
 	 */
 	async givenItemsWithInterest(data) {
-		try{
-
-			if(Object.keys(data).length === 0) throw new Error('no items exist')
-
+		
 			const dataSize = Object.keys(data).length
 			for (let i = 0; i < dataSize; i++) {
 				data[i].interest = await this.numberOfInterested(data[i].id)
 			}
 
 			return data
-		} catch(err) {
-			throw err
-		}
 	}
 
 	/**
@@ -476,25 +470,20 @@ module.exports = class items {
 	 * @returns updated object
 	 */
 	async getItemsToUpdate(itemData, body){
-		try {
 			
-			const title = body.title 
-			const price = body.price 
-			const shortDesc = body.shortDesc 
-			const longDesc = body.longDesc
-			
+		const title = body.title 
+		const price = body.price 
+		const shortDesc = body.shortDesc 
+		const longDesc = body.longDesc
+		
 
-			if(!(title === null || title.length === 0)) itemData[0].title = title
-			if(!(shortDesc === null || shortDesc.length === 0)) itemData[0].shortDesc = shortDesc
-			if(!(longDesc === null || longDesc.length === 0)) itemData[0].longDesc = longDesc
-			if(price) itemData[0].price = price
+		if(!(title === null || title.length === 0)) itemData[0].title = title
+		if(!(shortDesc === null || shortDesc.length === 0)) itemData[0].shortDesc = shortDesc
+		if(!(longDesc === null || longDesc.length === 0)) itemData[0].longDesc = longDesc
+		if(price) itemData[0].price = price
 
-			
-			return itemData
-
-		} catch(err) {
-			throw err
-		}
+		
+		return itemData
 			
 	}
 
@@ -510,8 +499,6 @@ module.exports = class items {
 
 			const itemData = await this.getDetails(itemID)
 			const originalName = [{title: itemData[0].title}]
-
-			if(Object.keys(itemData).length === 0) throw new Error('item does not exist')
 
 			const newItemData = await this.getItemsToUpdate(itemData, body)
 
@@ -535,5 +522,22 @@ module.exports = class items {
 			throw err
 		}
 	}
+
+	async deleteItem(itemID){
+		try{
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			//test if item exists
+			const itemData = await this.getDetails(itemID)
+
+			const sql = `DELETE FROM items WHERE id = ${itemID}`
+			await this.db.run(sql)
+
+			return true;
+		} catch(err) {
+			throw err
+		}
+	}
+	
 
 }

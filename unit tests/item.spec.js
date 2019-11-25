@@ -10,10 +10,11 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
 		//setup of item
-		const newItem = await new Item()
 		const addedItem = await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		expect(addedItem).toBe(true)
@@ -24,10 +25,11 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
 		//setup of item
-		const newItem = await new Item()
 
 		await expect( newItem.addItem(null, '', 1000, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing userID') )
@@ -38,10 +40,11 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
 		//setup of item
-		const newItem = await new Item()
 
 		await expect( newItem.addItem(1, '', 1000, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing title') )
@@ -52,10 +55,11 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
 		//setup of item
-		const newItem = await new Item()
 
 		await expect( newItem.addItem(1, 'monalisa', null, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing price') )
@@ -66,10 +70,11 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
 		//setup of item
-		const newItem = await new Item()
 
 		await expect( newItem.addItem(1, 'monalisa', 1000, '', 'very nice') )
 			.rejects.toEqual( Error('missing short description') )
@@ -80,10 +85,11 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
 		//setup of item
-		const newItem = await new Item()
 
 		await expect( newItem.addItem(1, 'monalisa', 1000, 'nice', '') )
 			.rejects.toEqual( Error('missing long description') )
@@ -964,6 +970,17 @@ describe('search()', () => {
 		done()
 	})
 
+	test('invalid querystring', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.search('abcdef') )
+			.rejects.toEqual( Error('no items exist for this search') )
+		done()
+	})
+
 })
 
 describe('givenItemsWithInterest()', () => {
@@ -1092,6 +1109,62 @@ describe('updateItem()', () => {
 		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
 
 		await expect( newItem.updateItem(2, body) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+})
+
+describe('deleteItem()', () => {
+
+	test('deleting an item', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+		//setup of item
+	 	await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		const result = await newItem.deleteItem(1)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('deleting an item with multiple items', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+		//setup of item
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+		await newItem.addItem(1, 'monalisa3', 2000, '3nice', '3very nice')
+
+		const result = await newItem.deleteItem(2)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+
+	test('missing itemID', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+
+		await expect( newItem.deleteItem(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('item does not exist', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+
+		await expect( newItem.deleteItem(5) )
 			.rejects.toEqual( Error('item does not exist') )
 		done()
 	})
