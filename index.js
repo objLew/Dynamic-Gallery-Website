@@ -402,7 +402,13 @@ router.post('/items/:index/paypal', koaBody, async ctx => {
 	}
 })
 
-
+/**
+ * Page to edit items.
+ *
+ * @name Edit Items Page
+ * @route {GET} /items/:index/edit
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/items/:index/edit', async ctx => {
 	try{
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
@@ -413,6 +419,12 @@ router.get('/items/:index/edit', async ctx => {
 	}
 })
 
+/**
+ * The script to update item details.
+ *
+ * @name Edit Script
+ * @route {POST} /items/:index/edit
+ */
 router.post('/items/:index/edit', koaBody, async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')

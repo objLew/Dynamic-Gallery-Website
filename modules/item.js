@@ -469,6 +469,12 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Updates the object where the user has given new details
+	 * @param {Object} itemData 
+	 * @param {Object} body 
+	 * @returns updated object
+	 */
 	async getItemsToUpdate(itemData, body){
 		try {
 			
@@ -492,7 +498,12 @@ module.exports = class items {
 			
 	}
 
-
+	/**
+	 * Updates details where users have inputted new details
+	 * @param {number} itemID 
+	 * @param {ctx.request.body} body 
+	 * @returns true upon successful update
+	 */
 	async updateItem(itemID, body){
 		try {
 			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
