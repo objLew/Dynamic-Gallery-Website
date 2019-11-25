@@ -451,7 +451,7 @@ module.exports = class items {
 	 * Global search for items of interest - checks the title, short and long descriptions
 	 * @name search
 	 * @param {string} querystring 
-	 * @returns 
+	 * @returns returns all items with the searched string
 	 */
 	async search(querystring) {
 		try {
