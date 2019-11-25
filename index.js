@@ -16,7 +16,7 @@ const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
 const sharp = require('sharp')
-var watermark = require('image-watermark')
+const watermark = require('image-watermark')
 
 //const stat = require('koa-static')
 //const handlebars = require('koa-hbs-renderer')
@@ -209,9 +209,6 @@ router.get('/addItem', async ctx => {
  * @route {POST} /addItem
  */
 
-// eslint-disable-next-line complexity
-// eslint-disable-next-line max-lines-per-function
-// eslint-disable-next-line max-statements
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
@@ -226,9 +223,11 @@ router.post('/addItem', koaBody, async ctx => {
 			  .toFile(`public/items/${body.title}1_small.png`)
 		}
 		await fs.copy(path, `public/items/${body.title}1_big.png`)
+		/*
 		if(fs.existsSync(`public/items/${body.title}1_big.png`)) {
 			watermark.embedWatermark(`public/items/${body.title}1_big.png`, {'text': 'sample watermark'})
 		}
+		*/
 
 		var {path, type} = ctx.request.files.pic2
 		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
@@ -238,11 +237,13 @@ router.post('/addItem', koaBody, async ctx => {
 			  .toFile(`public/items/${body.title}2_small.png`)
 		}
 		await fs.copy(path, `public/items/${body.title}2_big.png`)
+		/*
 		if(fs.existsSync(`public/items/${body.title}2_big.png`)) {
 			watermark.embedWatermark(`public/items/${body.title}2_big.png`, {'text': 'property of Lewis Lovette'}, (err) => {
 				if (!err) console.log('pass 2')
 			})
 		}
+		*/
 
 		var {path, type} = ctx.request.files.pic3
 		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
@@ -252,12 +253,13 @@ router.post('/addItem', koaBody, async ctx => {
 				.toFile(`public/items/${body.title}3_small.png`)
 		}
 		await fs.copy(path, `public/items/${body.title}3_big.png`)
+		/*
 		if(fs.existsSync(`public/items/${body.title}3_big.png`)) {
 			watermark.embedWatermark(`public/items/${body.title}3_big.png`, {'text': 'property of Lewis Lovette'}, (err) => {
 				if (!err) console.log('pass 3')
 			})
-
 		}
+		*/
 
 		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
@@ -292,7 +294,15 @@ router.get('/items/:index', async ctx => {
 
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
-		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
+
+		let edit = true
+		if(itemData[0].userID === ctx.session.userID) {
+			edit = true
+		} else{
+			edit = false
+		}
+
+		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested, edit: edit})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -387,6 +397,31 @@ router.post('/items/:index/paypal', koaBody, async ctx => {
 		item.sendPayPalEmail(itemData, sellerData, buyerData)
 
 		await ctx.redirect(`/gallery?msg=thank you for your purchase of item number: ${ctx.params.index}, ${itemData[0].title}`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+
+router.get('/items/:index/edit', async ctx => {
+	try{
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		await ctx.render('edit', {itemID: ctx.params.index})
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+router.post('/items/:index/edit', koaBody, async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		const body = ctx.request.body
+
+		const item = await new Item(dbName)
+		await item.updateItem(ctx.params.index, body)
+
+		await ctx.redirect(`/items/${ctx.params.index}`)
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
 	}

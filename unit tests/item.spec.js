@@ -1000,6 +1000,105 @@ describe('givenItemsWithInterest()', () => {
 
 })
 
+describe('getItemsToUpdate()', () => {
+	test('succesful update of specified fields', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(1)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].title).toBe('new')
+		done()
+	})
+
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].title).toBe('new')
+		done()
+	})
+})
+
+
+describe('updateItem()', () => {
+	test('succesful update of specified fields', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.updateItem(1, body)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+		await newItem.addItem(1, 'monalisa3', 2000, '3nice', '3very nice')
+
+
+		const result = await newItem.updateItem(2, body)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await expect( newItem.updateItem(null, body) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('no items exist to update', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await expect( newItem.updateItem(2, body) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+})
+
+
 /*
 describe('getImages()', () => {
 	test('appropriate setup', async done => {

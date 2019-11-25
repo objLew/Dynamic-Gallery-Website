@@ -51,7 +51,7 @@
 		{{#each image}}
 		<a href="/items/{{this}}_big.png" target="_blank">
 			<img src='../items/{{this}}_small.png' alt="{{this.title}}" width="300" height="200">
-			</a>
+		</a>
 		{{/each}}
 
 		{{#each item}}
@@ -63,6 +63,14 @@
 			<a href="/items/{{this.id}}/paypal">Buy this Item</a>
 
 		{{/each}}
+
+		{{#if edit}}
+			{{#each item}}
+				<form action="/items/{{this.id}}/edit">
+					<button type="submit" value="edit">edit item details</button>
+				</form>
+			{{/each}}
+		{{/if}}
 
 		
 	</body>
