@@ -442,6 +442,13 @@ router.post('/items/:index/edit', koaBody, async ctx => {
 })
 
 
+/**
+ * Page to delete items.
+ *
+ * @name delete Items Page
+ * @route {GET} /items/:index/delete
+ * @authentication This route requires cookie-based authentication.
+ */
 router.get('/items/:index/delete', async ctx => {
 	try{
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
@@ -453,6 +460,12 @@ router.get('/items/:index/delete', async ctx => {
 	}
 })
 
+/**
+ * The script to delete an item.
+ *
+ * @name delete Script
+ * @route {POST} /items/:index/delete
+ */
 router.post('/items/:index/delete', koaBody, async ctx => {
 	try {
 		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')

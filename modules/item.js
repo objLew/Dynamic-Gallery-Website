@@ -523,6 +523,11 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Deletes an item from the database
+	 * @param {number} itemID 
+	 * @returns true if item is successfully deleted
+	 */
 	async deleteItem(itemID){
 		try{
 			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
