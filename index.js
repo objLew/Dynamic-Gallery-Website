@@ -16,12 +16,7 @@ const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
 const sharp = require('sharp')
-// @ts-ignore
-const watermark = require('image-watermark')
-
-const path = require('path')
-
-//const imaginary = require('imaginary')
+var watermark = require('image-watermark')
 
 //const stat = require('koa-static')
 //const handlebars = require('koa-hbs-renderer')
@@ -216,20 +211,55 @@ router.get('/addItem', async ctx => {
 
 // eslint-disable-next-line complexity
 // eslint-disable-next-line max-lines-per-function
+// eslint-disable-next-line max-statements
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
 		const body = ctx.request.body
 		const item = await new Item(dbName)
 
-		const imagePath = await path.resolve(__dirname, 'public/items/hini1_big.png')
-		if(fs.existsSync(imagePath)) {
-			console.log('I"m about to KMS')
-			await watermark.embedWatermark(imagePath, {'text': 'sample watermark'})
-			console.log('Unable to kms :(')
+		var {path, type} = ctx.request.files.pic1
+		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
+			console.log(`${path } 1`)
+			await sharp(path)
+			  .resize(300, 200)
+			  .toFile(`public/items/${body.title}1_small.png`)
+		}
+		await fs.copy(path, `public/items/${body.title}1_big.png`)
+		if(fs.existsSync(`public/items/${body.title}1_big.png`)) {
+			watermark.embedWatermark(`public/items/${body.title}1_big.png`, {'text': 'sample watermark'})
 		}
 
-		//await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
+		var {path, type} = ctx.request.files.pic2
+		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
+			console.log(`${path } 2`)
+			await sharp(path)
+  			  .resize(300, 200)
+			  .toFile(`public/items/${body.title}2_small.png`)
+		}
+		await fs.copy(path, `public/items/${body.title}2_big.png`)
+		if(fs.existsSync(`public/items/${body.title}2_big.png`)) {
+			watermark.embedWatermark(`public/items/${body.title}2_big.png`, {'text': 'property of Lewis Lovette'}, (err) => {
+				if (!err) console.log('pass 2')
+			})
+		}
+
+		var {path, type} = ctx.request.files.pic3
+		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
+			console.log(`${path} 3`)
+			await sharp(path)
+				.resize(300, 200)
+				.toFile(`public/items/${body.title}3_small.png`)
+		}
+		await fs.copy(path, `public/items/${body.title}3_big.png`)
+		if(fs.existsSync(`public/items/${body.title}3_big.png`)) {
+			watermark.embedWatermark(`public/items/${body.title}3_big.png`, {'text': 'property of Lewis Lovette'}, (err) => {
+				if (!err) console.log('pass 3')
+			})
+
+		}
+
+		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
 		await ctx.redirect('/gallery')
 	} catch(err) {
