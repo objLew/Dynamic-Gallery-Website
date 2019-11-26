@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable max-lines */
 /* eslint-disable no-var */
-/* eslint-disable max-len */
 
 //Routes File
 

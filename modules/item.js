@@ -432,13 +432,13 @@ module.exports = class items {
 	 * @returns specific items with interest levels on each
 	 */
 	async givenItemsWithInterest(data) {
-		
-			const dataSize = Object.keys(data).length
-			for (let i = 0; i < dataSize; i++) {
-				data[i].interest = await this.numberOfInterested(data[i].id)
-			}
 
-			return data
+		const dataSize = Object.keys(data).length
+		for (let i = 0; i < dataSize; i++) {
+			data[i].interest = await this.numberOfInterested(data[i].id)
+		}
+
+		return data
 	}
 
 	/**
@@ -465,35 +465,35 @@ module.exports = class items {
 
 	/**
 	 * Updates the object where the user has given new details
-	 * @param {Object} itemData 
-	 * @param {Object} body 
+	 * @param {Object} itemData
+	 * @param {Object} body
 	 * @returns updated object
 	 */
-	async getItemsToUpdate(itemData, body){
-			
-		const title = body.title 
-		const price = body.price 
-		const shortDesc = body.shortDesc 
+	async getItemsToUpdate(itemData, body) {
+
+		const title = body.title
+		const price = body.price
+		const shortDesc = body.shortDesc
 		const longDesc = body.longDesc
-		
+
 
 		if(!(title === null || title.length === 0)) itemData[0].title = title
 		if(!(shortDesc === null || shortDesc.length === 0)) itemData[0].shortDesc = shortDesc
 		if(!(longDesc === null || longDesc.length === 0)) itemData[0].longDesc = longDesc
 		if(price) itemData[0].price = price
 
-		
+
 		return itemData
-			
+
 	}
 
 	/**
 	 * Updates details where users have inputted new details
-	 * @param {number} itemID 
-	 * @param {ctx.request.body} body 
+	 * @param {number} itemID
+	 * @param {ctx.request.body} body
 	 * @returns true upon successful update
 	 */
-	async updateItem(itemID, body){
+	async updateItem(itemID, body) {
 		try {
 			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
 
@@ -510,14 +510,14 @@ module.exports = class items {
 
 			const images = await this.getImages(originalName)
 			const changeImages = images.length
-			
-			for(let i = 1; i <= changeImages; i++){
+
+			for(let i = 1; i <= changeImages; i++) {
 				fs.renameSync(`public/items/${originalName[0].title}${i}_small.png`, `public/items/${newItemData[0].title}${i}_small.png`)
 				fs.renameSync(`public/items/${originalName[0].title}${i}_big.png`, `public/items/${newItemData[0].title}${i}_big.png`)
 			}
 
-		
-			return true;
+
+			return true
 		} catch(err) {
 			throw err
 		}
@@ -525,10 +525,10 @@ module.exports = class items {
 
 	/**
 	 * Deletes an item from the database
-	 * @param {number} itemID 
+	 * @param {number} itemID
 	 * @returns true if item is successfully deleted
 	 */
-	async deleteItem(itemID){
+	async deleteItem(itemID) {
 		try{
 			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
 
@@ -538,11 +538,11 @@ module.exports = class items {
 			const sql = `DELETE FROM items WHERE id = ${itemID}`
 			await this.db.run(sql)
 
-			return true;
+			return true
 		} catch(err) {
 			throw err
 		}
 	}
-	
+
 
 }
