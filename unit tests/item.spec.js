@@ -11,8 +11,11 @@ describe('add item', () => {
 		//setup account
 		const account = await new Accounts()
 		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
 
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
+
+		spy.mockRestore()
 
 		//setup of item
 		const addedItem = await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
@@ -26,10 +29,11 @@ describe('add item', () => {
 		//setup account
 		const account = await new Accounts()
 		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
 
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
+		spy.mockRestore()
 
 		await expect( newItem.addItem(null, '', 1000, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing userID') )
@@ -41,10 +45,11 @@ describe('add item', () => {
 		//setup account
 		const account = await new Accounts()
 		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
 
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, '', 1000, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing title') )
@@ -56,10 +61,11 @@ describe('add item', () => {
 		//setup account
 		const account = await new Accounts()
 		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
 
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, 'monalisa', null, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing price') )
@@ -71,10 +77,11 @@ describe('add item', () => {
 		//setup account
 		const account = await new Accounts()
 		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
 
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, 'monalisa', 1000, '', 'very nice') )
 			.rejects.toEqual( Error('missing short description') )
@@ -86,10 +93,11 @@ describe('add item', () => {
 		//setup account
 		const account = await new Accounts()
 		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
 
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, 'monalisa', 1000, 'nice', '') )
 			.rejects.toEqual( Error('missing long description') )
@@ -546,16 +554,15 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		const result = await newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', 5)
 
@@ -569,14 +576,15 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing item') )
@@ -589,14 +597,14 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing itemOwner') )
@@ -609,14 +617,14 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, null, 'subject', 'body of email', 5) )
 			.rejects.toEqual( Error('missing interestedUser') )
@@ -629,15 +637,15 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, '', 'body of email', 5) )
 			.rejects.toEqual( Error('missing subject') )
@@ -650,15 +658,16 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', '', 5) )
 			.rejects.toEqual( Error('missing email body') )
@@ -671,15 +680,16 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', null) )
 			.rejects.toEqual( Error('missing offer') )
@@ -695,9 +705,9 @@ describe('sendPayPalEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
@@ -705,6 +715,7 @@ describe('sendPayPalEmail()', () => {
 		const sellerDetails = await account.getDetails(1)
 		const buyerDetails = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		const result = await newItem.sendPayPalEmail(itemDetails, sellerDetails, buyerDetails)
 
@@ -718,14 +729,15 @@ describe('sendPayPalEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const sellerDetails = await account.getDetails(1)
 		const buyerDetails = await account.getDetails(2)
+		spy.mockRestore()
 
 		await expect( newItem.sendPayPalEmail(null, sellerDetails, buyerDetails) )
 			.rejects.toEqual( Error('missing item') )
@@ -738,14 +750,15 @@ describe('sendPayPalEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const buyerDetails = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendPayPalEmail(itemDetails, null, buyerDetails) )
 			.rejects.toEqual( Error('missing seller') )
@@ -758,14 +771,15 @@ describe('sendPayPalEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const sellerDetails = await account.getDetails(1)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendPayPalEmail(itemDetails, sellerDetails, null) )
 			.rejects.toEqual( Error('missing buyer') )
