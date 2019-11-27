@@ -1,5 +1,6 @@
-
 'use strict'
+
+const mock = require('mock-fs')
 
 const Accounts = require('../modules/user.js')
 const Item = require('../modules/item.js')
@@ -104,28 +105,70 @@ describe('add item', () => {
 		done()
 	})
 
+})
 
-	/*
-    test('get userID associated with item', async done => {
-        expect.assertions(1)
-        //setup account
-		const account = await new Accounts()
-        await account.register('doej', 'password')
+describe('getImages()', () => {
 
-        //setup of item
-        const newItem = await new Item()
-        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+	beforeEach(() => {
+		console.log('')
+		mock({
+			public: {
+				item: {
 
-        const sql = 'SELECT userID FROM items WHERE id = 1;'    //getting the user for first item
-		const db = await Database.open(dbName)
-		const data = await db.all(sql)
-		await db.close()
+				}
+			},
+			'public/items/pictureUpload1_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/pictureUpload2_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/pictureUpload3_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9])
+		})
+	})
+	afterEach(mock.restore)
 
-		expect(data).toEqual(1)
+	test('appropriate setup testing image 1', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[0]).toBe('pictureUpload1')
 		done()
-    })
-    */
+	})
 
+	test('appropriate setup testing image 2', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[1]).toBe('pictureUpload2')
+		done()
+	})
+
+	test('appropriate setup testing image 3', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[2]).toBe('pictureUpload3')
+		done()
+	})
+
+	test('non existent item', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.getImages(null) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
 })
 
 describe('markAsSold()', () => {
@@ -1072,6 +1115,20 @@ describe('getItemsToUpdate()', () => {
 
 
 describe('updateItem()', () => {
+	beforeEach(() => {
+		console.log('')
+		mock({
+			public: {
+				item: {
+
+				}
+			},
+			'public/items/monalisa1_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/monalisa1_big.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+		})
+	})
+	afterEach(mock.restore)
+
 	test('succesful update of specified fields', async done => {
 		expect.assertions(1)
 
@@ -1128,6 +1185,8 @@ describe('updateItem()', () => {
 			.rejects.toEqual( Error('item does not exist') )
 		done()
 	})
+
+	
 
 })
 
@@ -1187,46 +1246,3 @@ describe('deleteItem()', () => {
 
 })
 
-
-/*
-describe('getImages()', () => {
-	test('appropriate setup', async done => {
-		expect.assertions(1)
-		//setup of item
-		const item = await new Item()
-
-		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-		const itemDetails = await item.getDetails(1)
-
-		const result = await item.getImages(itemDetails)
-
-		expect().toBe()
-		done()
-	})
-
-	test('get all items with multiple images', async done => {
-		expect.assertions(1)
-		//setup of item
-		const item = await new Item()
-
-		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-		const itemDetails = await item.getDetails(1)
-
-		const result = await item.getImages(itemDetails)
-
-		expect().toBe()
-		done()
-	})
-
-	test('no images', async done => {
-		expect.assertions(1)
-		//setup of item
-		const item = await new Item()
-
-		await expect( item.allItemWithInterest() )
-			.rejects.toEqual( Error('no images exist') )
-		done()
-	})
-
-})
-*/

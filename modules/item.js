@@ -279,7 +279,10 @@ module.exports = class items {
 			}
 
 			transporter.sendMail(mailOptions, (error, info) => {
-				//sending the email
+				if (error) {
+					return console.log(error)
+				}
+				console.log('Message sent: %s', info.messageId)
 			})
 
 			return true
@@ -314,7 +317,10 @@ module.exports = class items {
 			}
 
 			transporter.sendMail(mailOptions, (error, info) => {
-				//sending the email
+				if (error) {
+					return console.log(error)
+				}
+				console.log('Message sent: %s', info.messageId)
 			})
 
 			return true
@@ -396,6 +402,8 @@ module.exports = class items {
 	 */
 	async getImages(itemData) {
 		try{
+			if(!itemData) throw new Error('item does not exist')
+
 			const images = []
 			for(let i = 1; i <= maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}_small.png`)) images.push(itemData[0].title+i)
 
@@ -411,24 +419,21 @@ module.exports = class items {
 	 * @returns an array with all items and their interest level
 	 */
 	async allItemWithInterest() {
-		try{
-			const sql = 'SELECT * FROM items;'
-			const data = await this.db.all(sql)
+		const sql = 'SELECT * FROM items;'
+		const data = await this.db.all(sql)
 
-			if(Object.keys(data).length === 0){
-				//no items exist
-				return false
-			}
-			
-			const dataSize = Object.keys(data).length
-			for (let i = 0; i < dataSize; i++) {
-				data[i].interest = await this.numberOfInterested(data[i].id)
-			}
-
-			return data
-		} catch(err) {
-			throw err
+		if(Object.keys(data).length === 0) {
+			//no items exist
+			return false
 		}
+
+		const dataSize = Object.keys(data).length
+		for (let i = 0; i < dataSize; i++) {
+			data[i].interest = await this.numberOfInterested(data[i].id)
+		}
+
+		return data
+
 	}
 
 	/**

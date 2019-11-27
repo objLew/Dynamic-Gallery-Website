@@ -76,7 +76,7 @@ router.get('/gallery', async ctx => {
 
 		if(ctx.query.msg) data.msg = ctx.query.msg
 
-		if(data === false) await ctx.render('galleryNoItem', {auth: auth})
+		//if(data === false) await ctx.render('galleryNoItem', {auth: auth})
 		await ctx.render('gallery', {data: data, auth: auth})
 
 	} catch(err) {

@@ -117,8 +117,8 @@ describe('Registering', () => {
 	}, 16000)
 })
 
-describe('Registeringv2', () => {
-	test('Register a userweewqe', async done => {
+describe('Checking user profile', () => {
+	test('profile name', async done => {
 		//start generating a trace file.
 		await page.tracing.start({path: 'trace/registering_user_har.json',screenshots: true})
 		await har.start({path: 'trace/registering_user_trace.har'})
