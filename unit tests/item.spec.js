@@ -924,8 +924,9 @@ describe('allItemWithInterest()', () => {
 		//setup of item
 		const item = await new Item()
 
-		await expect( item.allItemWithInterest() )
-			.rejects.toEqual( Error('no items exist') )
+		const result = await item.allItemWithInterest()
+
+		expect(result).toBe(false)
 		done()
 	})
 

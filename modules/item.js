@@ -413,8 +413,11 @@ module.exports = class items {
 			const sql = 'SELECT * FROM items;'
 			const data = await this.db.all(sql)
 
-			if(Object.keys(data).length === 0) throw new Error('no items exist')
-
+			if(Object.keys(data).length === 0){
+				console.log('no items exist')
+				return false
+			}
+			
 			const dataSize = Object.keys(data).length
 			for (let i = 0; i < dataSize; i++) {
 				data[i].interest = await this.numberOfInterested(data[i].id)

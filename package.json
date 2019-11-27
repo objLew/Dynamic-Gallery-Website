@@ -11,9 +11,9 @@
     "jsdoc": "node_modules/.bin/jsdoc -c jsdoc.conf",
     "linter": "node_modules/.bin/eslint .",
     "unit": "./node_modules/.bin/jest --coverage 'unit tests/'",
-    "test": "node_modules/.bin/jest --coverage --runInBand",
-    "testNoBand": "node_modules/.bin/jest --coverage",
-    "acceptance": "acceptanceTests/scripts/test.sh"
+    "test": "node_modules/.bin/jest --coverage 'unit tests'",
+    "acceptance": "acceptanceTests/scripts/test.sh",
+    "nodemon": "nodemon index.js"
   },
   "jest": {
     "projects": [

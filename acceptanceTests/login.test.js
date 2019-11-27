@@ -49,8 +49,8 @@ describe('Registering', () => {
 		await page.type('input[name=paypal]', 'paypalname')
 		await page.type('input[name=email]', 'NewUser@gmail.com')
 		await page.type('input[name=pass]', 'password')
+		await page.click('input[type=submit]') 
 
-		await page.click('input[type=submit]')
 		await page.goto('http://localhost:8080/login', { timeout: 30000, waitUntil: 'load' })
 		await page.type('input[name=user]', 'NewUser')
 		await page.type('input[name=pass]', 'password')

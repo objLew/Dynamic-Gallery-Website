@@ -65,11 +65,12 @@ router.get('/', async ctx => {
 router.get('/gallery', async ctx => {
 	try {
 		const item = await new Item(dbName)
-
 		const data = await item.allItemWithInterest()
 		const auth = ctx.session.authorised
+
 		if(ctx.query.msg) data.msg = ctx.query.msg
 
+		if(data === false) await ctx.render('galleryNoItem', {auth: auth})
 		await ctx.render('gallery', {data: data, auth: auth})
 
 	} catch(err) {
