@@ -414,7 +414,7 @@ module.exports = class items {
 			const data = await this.db.all(sql)
 
 			if(Object.keys(data).length === 0){
-				console.log('no items exist')
+				//no items exist
 				return false
 			}
 			

@@ -120,7 +120,6 @@ router.post('/register', koaBody, async ctx => {
 	try {
 		// extract the data from the request
 		const body = ctx.request.body
-		console.log(body)
 
 		const {path, type} = ctx.request.files.avatar
 
@@ -163,12 +162,12 @@ router.get('/login', async ctx => {
 router.post('/login', async ctx => {
 	try {
 		const body = ctx.request.body
-		console.log(body)
+
 		const user = await new User(dbName)
+		
 		ctx.session.userID = await user.login(body.user, body.pass)
 		ctx.session.authorised = true
 
-		console.log(ctx.session.userID)
 
 		return await ctx.redirect('gallery')
 	} catch(err) {
@@ -198,7 +197,6 @@ router.get('/logout', async ctx => {
 router.get('/addItem', async ctx => {
 	if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 	await ctx.render('addItem')
-	console.log(ctx.session.userID)
 })
 
 /**
