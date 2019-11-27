@@ -879,8 +879,9 @@ describe('getUsersItems()', () => {
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
-		await expect( newItem.getUsersItems(5) )
-			.rejects.toEqual( Error('user does not exist') )
+		const result = await newItem.getUsersItems(5)
+
+		expect(result).toBe(false)
 		done()
 	})
 

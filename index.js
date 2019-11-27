@@ -14,7 +14,13 @@ const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
 const sharp = require('sharp')
+
 const watermark = require('image-watermark')
+var imaginary = require('imaginary')
+var Jimp = require('jimp');
+var jimpWatermark = require('jimp-watermark');
+
+
 
 //const stat = require('koa-static')
 //const handlebars = require('koa-hbs-renderer')
@@ -495,6 +501,8 @@ router.get('/user/:index', async ctx => {
 		const userItem = await item.getUsersItems(ctx.params.index)
 
 		const userNumberInterest = await item.userNumberInterest(ctx.params.index)
+		
+		if(userItem === false) await ctx.render('user', {user: userData, userNumberInterest: userNumberInterest})
 
 		await ctx.render('user', {user: userData, item: userItem, userNumberInterest: userNumberInterest})
 

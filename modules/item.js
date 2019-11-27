@@ -378,7 +378,9 @@ module.exports = class items {
 			const sql = `SELECT * FROM items WHERE userID = "${userID}"`
 			const userItems = await this.db.all(sql)
 
-			if(Object.keys(userItems).length === 0) throw new Error('user does not exist')
+			if(Object.keys(userItems).length === 0) {
+				return false
+			}
 
 			return userItems
 		} catch(err) {
