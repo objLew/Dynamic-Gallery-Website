@@ -165,7 +165,7 @@ router.post('/login', async ctx => {
 		const body = ctx.request.body
 
 		const user = await new User(dbName)
-		
+
 		ctx.session.userID = await user.login(body.user, body.pass)
 		ctx.session.authorised = true
 
