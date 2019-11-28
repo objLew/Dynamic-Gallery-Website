@@ -1,5 +1,6 @@
-
 'use strict'
+
+const mock = require('mock-fs')
 
 const Accounts = require('../modules/user.js')
 const Item = require('../modules/item.js')
@@ -10,10 +11,14 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
+		spy.mockRestore()
+
 		//setup of item
-		const newItem = await new Item()
 		const addedItem = await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		expect(addedItem).toBe(true)
@@ -24,10 +29,12 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
-		const newItem = await new Item()
+		spy.mockRestore()
 
 		await expect( newItem.addItem(null, '', 1000, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing userID') )
@@ -38,10 +45,12 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
-		const newItem = await new Item()
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, '', 1000, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing title') )
@@ -52,10 +61,12 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
-		const newItem = await new Item()
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, 'monalisa', null, 'nice', 'very nice') )
 			.rejects.toEqual( Error('missing price') )
@@ -66,10 +77,12 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
-		const newItem = await new Item()
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, 'monalisa', 1000, '', 'very nice') )
 			.rejects.toEqual( Error('missing short description') )
@@ -80,39 +93,187 @@ describe('add item', () => {
 		expect.assertions(1)
 		//setup account
 		const account = await new Accounts()
+		const newItem = await new Item()
+		const spy = jest.spyOn(account, 'register').mockImplementation(() => ({return: true}))
+
 		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
 
-		//setup of item
-		const newItem = await new Item()
+		spy.mockRestore()
 
 		await expect( newItem.addItem(1, 'monalisa', 1000, 'nice', '') )
 			.rejects.toEqual( Error('missing long description') )
 		done()
 	})
 
+})
+
+describe('getImages()', () => {
+
+	beforeEach(() => {
+		mock({
+			public: {
+				item: {
+
+				}
+			},
+			'public/items/pictureUpload1_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/pictureUpload2_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/pictureUpload3_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9])
+		})
+	})
+	afterEach(mock.restore)
+
+	test('appropriate setup testing image 1', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[0]).toBe('pictureUpload1')
+		done()
+	})
+
+	test('appropriate setup testing image 2', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[1]).toBe('pictureUpload2')
+		done()
+	})
+
+	test('appropriate setup testing image 3', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[2]).toBe('pictureUpload3')
+		done()
+	})
+
+	test('non existent item', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.getImages(null) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+})
+
+describe('uploadItemPics()', () => {
+
+	beforeEach(() => {
+		console.log('')
+		mock({
+			public: {
+				item: {
+
+				}
+			},
+			'/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'/home/lewis/Documents/uni/lovettel/public/items/pictureUpload2.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'/home/lewis/Documents/uni/lovettel/public/items/pictureUpload3.png': Buffer.from([8, 6, 7, 5, 3, 0, 9])
+		})
+	})
+	afterEach(mock.restore)
+
+	test('appropriate setup testing image 1', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const path = ['/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png']
+		const type = ['image/png']
+
+		const result = await newItem.uploadItemPics(path, type, 'testpic')
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('missing path', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const type = ['image/png']
+
+		await expect( newItem.uploadItemPics(null, type, 'testpath' ) )
+			.rejects.toEqual( Error('missing path') )
+		done()
+	})
+
+	test('missing type', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const path = ['/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png']
+		const type = ['image/png']
+
+		await expect( newItem.uploadItemPics(path, null, 'testpath' ) )
+			.rejects.toEqual( Error('missing types') )
+		done()
+	})
+
+	test('missing title', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const path = ['/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png']
+
+		const type = ['image/png']
+
+		await expect( newItem.uploadItemPics(path, type, null ) )
+			.rejects.toEqual( Error('missing title') )
+		done()
+	})
+
 
 	/*
-    test('get userID associated with item', async done => {
-        expect.assertions(1)
-        //setup account
-		const account = await new Accounts()
-        await account.register('doej', 'password')
+	test('appropriate setup testing image 2', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
 
-        //setup of item
-        const newItem = await new Item()
-        await newItem.addItem(1, "monalisa", 1000, "nice", "very nice");
+		const result = await newItem.getImages(itemData)
 
-        const sql = 'SELECT userID FROM items WHERE id = 1;'    //getting the user for first item
-		const db = await Database.open(dbName)
-		const data = await db.all(sql)
-		await db.close()
-
-		expect(data).toEqual(1)
+		expect(result[1]).toBe('pictureUpload2')
 		done()
-    })
-    */
+	})
 
+	test('appropriate setup testing image 3', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[2]).toBe('pictureUpload3')
+		done()
+	})
+
+	test('non existent item', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.getImages(null) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+	*/
 })
+
 
 describe('markAsSold()', () => {
 	test('buyer/seller succesfully saved to db', async done => {
@@ -165,6 +326,63 @@ describe('markAsSold()', () => {
 
 		await expect( newItem.markAsSold(1, 2, null) )
 			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+
+})
+
+describe('isSold()', () => {
+	test('item not sold', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const markSold = await newItem.isSold(1)
+
+		expect(markSold).toBe(false)
+		done()
+	})
+
+	test('item is sold', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		await newItem.markAsSold(1, 2, 1)
+
+		const markSold = await newItem.isSold(1)
+
+		expect(markSold).toBe(true)
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		await expect( newItem.isSold(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('item does not exist', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+
+		await expect( newItem.isSold(1) )
+			.rejects.toEqual( Error('item does not exist') )
 		done()
 	})
 
@@ -483,16 +701,15 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
-
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		const result = await newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', 5)
 
@@ -506,16 +723,17 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
+		spy.mockRestore()
 
-		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+		await expect( newItem.sendEmail(null, itemOwner, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing item') )
 		done()
 	})
@@ -526,16 +744,16 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
-		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject of the email', 'body of email,test of nodejs', 5) )
+		await expect( newItem.sendEmail(itemDetails, null, interestedUser, 'subject test', 'body of email - test', 5) )
 			.rejects.toEqual( Error('missing itemOwner') )
 		done()
 	})
@@ -546,14 +764,14 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, null, 'subject', 'body of email', 5) )
 			.rejects.toEqual( Error('missing interestedUser') )
@@ -566,15 +784,15 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
-
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, '', 'body of email', 5) )
 			.rejects.toEqual( Error('missing subject') )
@@ -587,15 +805,16 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', '', 5) )
 			.rejects.toEqual( Error('missing email body') )
@@ -608,18 +827,109 @@ describe('sendEmail()', () => {
 		//setup of item
 		const newItem = await new Item()
 		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
 
-		await account.register('doej', 'doej@gmail.com', 'doejpal', 'password')
-		await account.register('doej1', 'doejONE@gmail.com', 'doejpal1', 'password1')
 
 		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
 
 		const itemOwner = await account.getDetails(1)
 		const interestedUser = await account.getDetails(2)
 		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
 
 		await expect( newItem.sendEmail(itemDetails, itemOwner, interestedUser, 'subject', 'body of email', null) )
 			.rejects.toEqual( Error('missing offer') )
+		done()
+	})
+
+})
+
+describe('sendPayPalEmail()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
+
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		const sellerDetails = await account.getDetails(1)
+		const buyerDetails = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
+
+		const result = await newItem.sendPayPalEmail(itemDetails, sellerDetails, buyerDetails)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('invalid item', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
+
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const sellerDetails = await account.getDetails(1)
+		const buyerDetails = await account.getDetails(2)
+		spy.mockRestore()
+
+		await expect( newItem.sendPayPalEmail(null, sellerDetails, buyerDetails) )
+			.rejects.toEqual( Error('missing item') )
+		done()
+	})
+
+	test('invalid owner ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
+
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const buyerDetails = await account.getDetails(2)
+		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
+
+		await expect( newItem.sendPayPalEmail(itemDetails, null, buyerDetails) )
+			.rejects.toEqual( Error('missing seller') )
+		done()
+	})
+
+	test('invalid interested user ID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const account = await new Accounts()
+		const spy = jest.spyOn(account, 'getDetails').mockImplementation(() => [
+			{user: 'doej', email: 'doej@gmail.com', paypal: 'doejpal', password: 'password'}])
+
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const sellerDetails = await account.getDetails(1)
+		const itemDetails = await newItem.getDetails(1)
+		spy.mockRestore()
+
+		await expect( newItem.sendPayPalEmail(itemDetails, sellerDetails, null) )
+			.rejects.toEqual( Error('missing buyer') )
 		done()
 	})
 
@@ -680,3 +990,431 @@ describe('getDetails()', () => {
 	})
 
 })
+
+describe('getUsersItems()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.getUsersItems(1)
+
+		expect(result[0].title).toBe('monalisa')
+		done()
+	})
+
+	test('get all items with multiple items', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'TWOmonalisa', 2000, 'TWOnice', 'TWOvery nice')
+		await newItem.addItem(2, 'THREEmonalisa', 3000, 'THREEnice', 'THREE very nice')
+
+		const result = await newItem.getUsersItems(1)
+
+		expect(result[1].title).toBe('TWOmonalisa')
+		done()
+	})
+
+	test('invalid userID', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+
+		await expect( newItem.getUsersItems(null) )
+			.rejects.toEqual( Error('missing userID') )
+		done()
+	})
+
+	test('non existent user', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.getUsersItems(5)
+
+		expect(result).toBe(false)
+		done()
+	})
+
+})
+
+
+describe('allItemWithInterest()', () => {
+	test('get all items with multiple items', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await item.addItem(1, 'TWOmonalisa', 2000, 'TWOnice', 'TWOvery nice')
+		await item.addItem(2, 'THREEmonalisa', 3000, 'THREEnice', 'THREE very nice')
+
+		item.addInterestedUser(2, 1)
+		item.addInterestedUser(2, 2)
+
+		const result = await item.allItemWithInterest()
+
+		expect(result[1].interest).toBe(2)
+		done()
+	})
+
+	test('no interest', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		await item.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await item.allItemWithInterest()
+
+		expect(result[0].interest).toBe(0)
+		done()
+	})
+
+	test('non existent items', async done => {
+		expect.assertions(1)
+		//setup of item
+		const item = await new Item()
+
+		const result = await item.allItemWithInterest()
+
+		expect(result).toBe(false)
+		done()
+	})
+
+})
+
+describe('search()', () => {
+	test('succesful search', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.search('nice')
+
+		expect(result[0].title).toBe('monalisa')
+		done()
+	})
+
+	test('succesful search with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const result = await newItem.search('nice')
+
+		expect(result[1].title).toBe('monalisa2')
+		done()
+	})
+
+	test('invalid querystring', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.search('') )
+			.rejects.toEqual( Error('missing querystring') )
+		done()
+	})
+
+	test('invalid querystring', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.search('abcdef') )
+			.rejects.toEqual( Error('no items exist for this search') )
+		done()
+	})
+
+})
+
+describe('givenItemsWithInterest()', () => {
+	test('appropriate setup', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemDetails = await newItem.getDetails(1)
+
+		const result = await newItem.givenItemsWithInterest(itemDetails)
+
+		expect(result[0].interest).toBe(0)
+		done()
+	})
+
+	test('appropriate setup with interest', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const itemDetails = await newItem.getDetails(1)
+		await newItem.addInterestedUser(1, 1)
+
+		const result = await newItem.givenItemsWithInterest(itemDetails)
+
+		expect(result[0].interest).toBe(1)
+		done()
+	})
+
+})
+
+describe('getItemsToUpdate()', () => {
+	test('succesful update of specified fields', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(1)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].title).toBe('new')
+		done()
+	})
+
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].title).toBe('new')
+		done()
+	})
+//
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: null, price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].title).toBe('monalisa2')
+		done()
+	})
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: null, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].price).toBe(2000)
+		done()
+	})
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: 1, shortDesc: null, longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].shortDesc).toBe('2nice')
+		done()
+	})
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: null}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].longDesc).toBe('2very nice')
+		done()
+	})
+})
+
+
+describe('updateItem()', () => {
+	beforeEach(() => {
+		mock({
+			public: {
+				item: {
+
+				}
+			},
+			'public/items/monalisa1_small.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/monalisa1_big.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+		})
+	})
+	afterEach(mock.restore)
+
+	test('succesful update of specified fields', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+
+		const result = await newItem.updateItem(1, body)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+		await newItem.addItem(1, 'monalisa3', 2000, '3nice', '3very nice')
+
+
+		const result = await newItem.updateItem(2, body)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('invalid itemID', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await expect( newItem.updateItem(null, body) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('no items exist to update', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		await expect( newItem.updateItem(2, body) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+	
+
+})
+
+describe('deleteItem()', () => {
+
+	test('deleting an item', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+		//setup of item
+	 	await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		const result = await newItem.deleteItem(1)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+	test('deleting an item with multiple items', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+		//setup of item
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+		await newItem.addItem(1, 'monalisa3', 2000, '3nice', '3very nice')
+
+		const result = await newItem.deleteItem(2)
+
+		expect(result).toBe(true)
+		done()
+	})
+
+
+	test('missing itemID', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+
+		await expect( newItem.deleteItem(null) )
+			.rejects.toEqual( Error('missing itemID') )
+		done()
+	})
+
+	test('item does not exist', async done => {
+		expect.assertions(1)
+		//setup account
+		const newItem = await new Item()
+
+
+		await expect( newItem.deleteItem(5) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+})
+

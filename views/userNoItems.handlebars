@@ -1,0 +1,32 @@
+<!doctype html>
+
+<html lang="en">
+    
+    <head >
+        {{#each user}}
+		<meta charset="utf-8">
+		<title>{{this.user}}s Page</title>
+		<meta name="description" content="Homepage for this user">
+		<meta name="author" content="Lewis Lovette">
+		<link href="../style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<h1>{{this.user}}s Page</h1>
+		{{/each}}
+		<p><a href="/gallery">back to home</a></p>
+		<p><a href="/logout">log out</a></p>
+
+		<p class="name">Number of items this user is interested in: {{userNumberInterest}}</p>
+
+		{{#each user}}
+        <div class="user" >
+            <img src='../avatars/{{this.user}}.png' alt="../avatars/avatar.png" width="300" height="200">
+            <div class="user">Name: {{this.user}}</div>
+            <!--<div class="title">Email: {{this.email}}</div>-->
+            <!--<div class="title">{{this.paypal}}</div>-->
+        </div>
+        {{/each}}
+        
+	</body>
+    
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+
+<html lang="en">
+    <head >
+		<meta charset="utf-8">
+		<title>Gallery Page</title>
+		<meta name="description" content="Homepage for the Gallery">
+		<meta name="author" content="Lewis Lovette">
+		<link href="../style.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<h1>Gallery Page</h1>
+		<p><a href="/addItem">Add an Item</a></p>
+		{{#if auth}}
+			<p><a href="/logout">log out</a></p>
+		{{/if}}
+		{{#unless auth}}
+			<p><a href="/login">log in</a></p>
+		{{/unless}}
+
+
+		<form action="/gallery" method="post">
+			<p>Search for item titles, long and short descriptions:<br /><input type="text" name="search" placeholder="search for title, long and short desc" value=""></p>
+			<p><input type="submit" value="Search"></p>
+		</form>
+
+		
+
+	</body>
+</html>

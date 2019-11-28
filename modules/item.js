@@ -7,6 +7,13 @@
 // const fs = require('fs-extra')
 //const mime = require('mime-types')
 
+const maxImages = 3
+
+const sharp = require('sharp')
+
+const fs = require('fs-extra')
+
+
 const sqlite = require('sqlite-async')
 const nodemailer = require('nodemailer')
 
@@ -87,10 +94,37 @@ module.exports = class items {
 			await this.db.run(sql)
 
 			//updating item to be sold
-			sql = 'UPDATE items SET sold = true WHERE id = ?', [itemID]
+			sql = `UPDATE items SET sold = true WHERE id = ${itemID}`
 			await this.db.run(sql)
 
 			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 *	Checks if an item is sold
+	 * @name isSold
+	 * @param {number} itemID
+	 * @returns true if the item is sold, false otherwise
+	 */
+	async isSold(itemID) {
+		try {
+			if(itemID === null || isNaN(itemID)) throw new Error('missing itemID')
+
+			const sql = `SELECT sold FROM items WHERE id=${itemID};`
+			const data = await this.db.get(sql)
+
+			//check for undefined/empty
+			if(!data || Object.keys(data).length === 0) throw new Error('item does not exist')
+
+			//as we get a string, convert this to an explicit true/false
+			if(data.sold === 'false' || data.sold === 0) {
+				return false
+			} else {
+				return true
+			}
 		} catch(err) {
 			throw err
 		}
@@ -243,14 +277,45 @@ module.exports = class items {
 				subject: `${subject}`,
 				text: `From: ${interestedUser[0].email}
 				\n Queried Item: ${item[0].title}
-				\n Original item price: ${item[0].price}
+				\n Original item price: £${item[0].price}
 				\n ${interestedUser[0].user}'s message: ${text}
 				\n Their offer: £${offer}`
 			}
 
-			transporter.sendMail(mailOptions, (error, info) => {
-				//sending the email
-			})
+			transporter.sendMail(mailOptions, 1)
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Send an email to the seller of the item upon a successful paypal purchase.
+	 * @name sendPayPalEmail
+	 * @param {Object} item
+	 * @param {Object} seller
+	 * @param {Object} buyer
+	 * @returns true if email is succesffuly send
+	 */
+	async sendPayPalEmail(item, seller, buyer) {
+		try{
+			if(item === null) throw new Error('missing item')
+			if(seller === null) throw new Error('missing seller')
+			if(buyer === null) throw new Error('missing buyer')
+
+			const mailOptions = {
+				from: `${buyer[0].email}`,
+				to: `${seller[0].email}`,
+				subject: `${buyer[0].user} bought your item: ${item[0].title}`,
+				text: `Buyers email: ${buyer[0].email}
+				\n Buyers username: ${buyer[0].user}
+				\n Buyers PayPal username: ${buyer[0].paypal}
+				\n Bought ttem: ${item[0].title}
+				\n Buyer paid original item price of: £${item[0].price}`
+			}
+
+			transporter.sendMail(mailOptions, 1)
 
 			return true
 		} catch(err) {
@@ -300,4 +365,228 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Get all items associated with a specified user
+	 * @name getUsersItems
+	 * @param {number} userID
+	 * @returns Object with all items associated with the specified user
+	 */
+	async getUsersItems(userID) {
+		try{
+			if(userID === null || userID.length === 0) throw new Error('missing userID')
+
+			const sql = `SELECT * FROM items WHERE userID = "${userID}"`
+			const userItems = await this.db.all(sql)
+
+			if(Object.keys(userItems).length === 0) {
+				return false
+			}
+
+			return userItems
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Checks how many images exist
+	 * @name getImages
+	 * @param {Object} itemData
+	 * @returns an array of image locations
+	 */
+	async getImages(itemData) {
+		try{
+			if(!itemData) throw new Error('item does not exist')
+
+			const images = []
+			for(let i = 1; i <= maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}_small.png`)) images.push(itemData[0].title+i)
+
+			return images
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Gets the interest from users for each item
+	 * @name allItemWithInterest
+	 * @returns an array with all items and their interest level
+	 */
+	async allItemWithInterest() {
+		const sql = 'SELECT * FROM items;'
+		const data = await this.db.all(sql)
+
+		if(Object.keys(data).length === 0) {
+			//no items exist
+			return false
+		}
+
+		const dataSize = Object.keys(data).length
+		for (let i = 0; i < dataSize; i++) {
+			data[i].interest = await this.numberOfInterested(data[i].id)
+		}
+
+		return data
+
+	}
+
+	/**
+	 * Gets the interest level for a specified set of
+	 * @name givenItemsWithInterest
+	 * @param {object} data
+	 * @returns specific items with interest levels on each
+	 */
+	async givenItemsWithInterest(data) {
+
+		const dataSize = Object.keys(data).length
+		for (let i = 0; i < dataSize; i++) {
+			data[i].interest = await this.numberOfInterested(data[i].id)
+		}
+
+		return data
+	}
+
+	/**
+	 * Global search for items of interest - checks the title, short and long descriptions
+	 * @name search
+	 * @param {string} querystring
+	 * @returns returns all items with the searched string
+	 */
+	async search(querystring) {
+		try {
+			if(querystring === null || querystring.length === 0) throw new Error('missing querystring')
+
+			const sql = `SELECT * FROM items WHERE upper(title) LIKE "%${querystring}%" OR upper(shortDesc) LIKE "%${querystring}%" OR upper(longDesc) LIKE "%${querystring}%"`
+			const data = await this.db.all(sql)
+
+			if(Object.keys(data).length === 0) throw new Error('no items exist for this search')
+
+
+			return data
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Updates the object where the user has given new details
+	 * @name getItemsToUpdate
+	 * @param {Object} itemData
+	 * @param {Object} body
+	 * @returns updated object
+	 */
+	async getItemsToUpdate(itemData, body) {
+
+		const title = body.title
+		const price = body.price
+		const shortDesc = body.shortDesc
+		const longDesc = body.longDesc
+
+
+		if(!(title === null || title.length === 0)) itemData[0].title = title
+		if(!(shortDesc === null || shortDesc.length === 0)) itemData[0].shortDesc = shortDesc
+		if(!(longDesc === null || longDesc.length === 0)) itemData[0].longDesc = longDesc
+		if(price) itemData[0].price = price
+
+
+		return itemData
+
+	}
+
+	/**
+	 * Updates details where users have inputted new details
+	 * @name updateItem
+	 * @param {number} itemID
+	 * @param {ctx.request.body} body
+	 * @returns true upon successful update
+	 */
+	async updateItem(itemID, body) {
+		try {
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			const itemData = await this.getDetails(itemID)
+			const originalName = [{title: itemData[0].title}]
+
+			const newItemData = await this.getItemsToUpdate(itemData, body)
+
+			const sql = `UPDATE items SET 
+				price = ${newItemData[0].price}, title = "${newItemData[0].title}",
+				shortDesc = "${newItemData[0].shortDesc}", longDesc = "${newItemData[0].longDesc}" 
+				WHERE id = ${newItemData[0].id}`
+			await this.db.run(sql)
+
+			const images = await this.getImages(originalName)
+			const changeImages = images.length
+
+			for(let i = 1; i <= changeImages; i++) {
+				fs.renameSync(`public/items/${originalName[0].title}${i}_small.png`, `public/items/${newItemData[0].title}${i}_small.png`)
+				fs.renameSync(`public/items/${originalName[0].title}${i}_big.png`, `public/items/${newItemData[0].title}${i}_big.png`)
+			}
+
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Deletes an item from the database
+	 * @name deleteItem
+	 * @param {number} itemID
+	 * @returns true if item is successfully deleted
+	 */
+	async deleteItem(itemID) {
+		try{
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			//test if item exists
+			const itemData = await this.getDetails(itemID)
+
+			const sql = `DELETE FROM items WHERE id = ${itemID}`
+			await this.db.run(sql)
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Uploads pictures for new items
+	 * @name uploadItemPics
+	 * @param {array} picsPath 
+	 * @param {array} picsType 
+	 * @param {string} title 
+	 * @returns true if successfully added images for items
+	 */
+	async uploadItemPics(picsPath, picsType, title) {
+		try{
+			if(!picsPath || picsPath === null) throw new Error('missing path')
+			if(!picsType || picsType === null) throw new Error('missing types')
+			if(!title || title.length === 0) throw new Error('missing title')
+
+			for(let i = 1; i <= maxImages; i++) {
+				// eslint-disable-next-line no-var
+				let path = picsPath[i-1]
+				let type = picsType[i-1]
+
+				if(String(type).match(/.(jpg|jpeg|png|gif)$/i)) {
+					await sharp(path)
+						.resize(300, 200)
+						.toFile(`public/items/${title}${i}_small.png`)
+						.catch(err => err)
+				} else{
+					break
+				}
+
+				await fs.copy(path, `/home/lewis/Documents/uni/lovettel/public/items/${title}${i}_big.png`)
+
+			}
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
 }
