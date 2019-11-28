@@ -431,7 +431,8 @@ module.exports = class items {
 	}
 
 	/**
-	 * Gets the interest level for a specified set od
+	 * Gets the interest level for a specified set of
+	 * @name givenItemsWithInterest
 	 * @param {object} data
 	 * @returns specific items with interest levels on each
 	 */
@@ -469,6 +470,7 @@ module.exports = class items {
 
 	/**
 	 * Updates the object where the user has given new details
+	 * @name getItemsToUpdate
 	 * @param {Object} itemData
 	 * @param {Object} body
 	 * @returns updated object
@@ -493,6 +495,7 @@ module.exports = class items {
 
 	/**
 	 * Updates details where users have inputted new details
+	 * @name updateItem
 	 * @param {number} itemID
 	 * @param {ctx.request.body} body
 	 * @returns true upon successful update
@@ -529,6 +532,7 @@ module.exports = class items {
 
 	/**
 	 * Deletes an item from the database
+	 * @name deleteItem
 	 * @param {number} itemID
 	 * @returns true if item is successfully deleted
 	 */
@@ -548,6 +552,14 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Uploads pictures for new items
+	 * @name uploadItemPics
+	 * @param {array} picsPath 
+	 * @param {array} picsType 
+	 * @param {string} title 
+	 * @returns true if successfully added images for items
+	 */
 	async uploadItemPics(picsPath, picsType, title) {
 		try{
 			if(!picsPath || picsPath === null) throw new Error('missing path')
