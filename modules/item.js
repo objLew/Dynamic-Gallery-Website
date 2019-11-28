@@ -10,8 +10,6 @@
 const maxImages = 3
 
 const sharp = require('sharp')
-const watermark = require('image-watermark')
-const pathReq = require('path')
 
 const fs = require('fs-extra')
 

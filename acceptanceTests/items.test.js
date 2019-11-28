@@ -224,3 +224,55 @@ describe('Buying Item', () => {
 	}, 16000)
 })
 
+describe('Delete Item', () => {
+	test('Deleting an item', async done => {
+		//start generating a trace file.
+		await page.tracing.start({path: 'trace/registering_user_har.json',screenshots: true})
+		await har.start({path: 'trace/registering_user_trace.har'})
+		//ARRANGE
+		await page.goto('http://localhost:8080/register', { timeout: 30000, waitUntil: 'load' })
+		//ACT
+		await page.type('input[name=user]', 'NewUser')
+		await page.type('input[name=paypal]', 'paypalname')
+		await page.type('input[name=email]', 'NewUser@gmail.com')
+		await page.type('input[name=pass]', 'password')
+		await page.click('input[type=submit]') 
+
+		await page.goto('http://localhost:8080/login', { timeout: 30000, waitUntil: 'load' })
+		await page.type('input[name=user]', 'NewUser')
+		await page.type('input[name=pass]', 'password')
+		await page.click('input[type=submit]')
+
+		await page.goto('http://localhost:8080/addItem', { timeout: 30000, waitUntil: 'load' })
+		await page.type('input[name=title]', 'title test')
+		await page.type('input[name=price]', '1')
+		await page.type('input[name=shortDesc]', 'short desc')
+		await page.type('input[name=longDesc]', 'a bigger desc')
+		await page.click('input[type=submit]')
+
+		//buying the item
+		await page.goto('http://localhost:8080/items/1', { timeout: 30000, waitUntil: 'load' })
+		await page.click('a[name=buy]')
+		await page.click('input[type=submit]')
+
+		//deleting the item
+		await page.goto('http://localhost:8080/items/1', { timeout: 30000, waitUntil: 'load' })
+		await page.click('input[value=delete]')
+
+
+		//ASSERT
+		//check that the user is taken to the homepage after attempting to login as the new user:
+		await page.waitForSelector('p[class=msg]')
+		expect( await page.evaluate( () => document.querySelector('p[class=msg]').innerText ) )
+			.toBe('item 1 deleted')
+
+		// grab a screenshot
+		const image = await page.screenshot()
+		// compare to the screenshot from the previous test run
+		expect(image).toMatchImageSnapshot()
+		// stop logging to the trace files
+		await page.tracing.stop()
+		await har.stop()
+		done()
+	}, 16000)
+})

@@ -220,7 +220,6 @@ router.post('/addItem', koaBody, async ctx => {
 		await item.uploadItemPics(picsPath, picsType, body.title)
 
 		let imagePath = pathReq.resolve(__dirname, `public/items/${body.title}1_big.png`)
-		console.log(imagePath)
 		if(fs.existsSync(imagePath)) await watermark.embedWatermark(imagePath, {'text': 'property of LEWIS LOVETTE','dstPath': `public/items/${body.title}1_big.png`})
 
 		imagePath = pathReq.resolve(__dirname, `public/items/${body.title}2_big.png`)
