@@ -8,7 +8,11 @@
 //const mime = require('mime-types')
 
 const maxImages = 3
+
+const sharp = require('sharp')
+
 const fs = require('fs-extra')
+
 
 const sqlite = require('sqlite-async')
 const nodemailer = require('nodemailer')
@@ -278,9 +282,7 @@ module.exports = class items {
 				\n Their offer: £${offer}`
 			}
 
-			transporter.sendMail(mailOptions, (error, info) => {
-				//sending the email
-			})
+			transporter.sendMail(mailOptions, 1)
 
 			return true
 		} catch(err) {
@@ -313,9 +315,7 @@ module.exports = class items {
 				\n Buyer paid original item price of: £${item[0].price}`
 			}
 
-			transporter.sendMail(mailOptions, (error, info) => {
-				//sending the email
-			})
+			transporter.sendMail(mailOptions, 1)
 
 			return true
 		} catch(err) {
@@ -378,7 +378,9 @@ module.exports = class items {
 			const sql = `SELECT * FROM items WHERE userID = "${userID}"`
 			const userItems = await this.db.all(sql)
 
-			if(Object.keys(userItems).length === 0) throw new Error('user does not exist')
+			if(Object.keys(userItems).length === 0) {
+				return false
+			}
 
 			return userItems
 		} catch(err) {
@@ -394,8 +396,10 @@ module.exports = class items {
 	 */
 	async getImages(itemData) {
 		try{
+			if(!itemData) throw new Error('item does not exist')
+
 			const images = []
-			for(let i = 0; i < maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}.png`)) images.push(itemData[0].title+i)
+			for(let i = 1; i <= maxImages; i++) if(fs.existsSync(`public/items/${itemData[0].title}${i}_small.png`)) images.push(itemData[0].title+i)
 
 			return images
 		} catch(err) {
@@ -409,48 +413,42 @@ module.exports = class items {
 	 * @returns an array with all items and their interest level
 	 */
 	async allItemWithInterest() {
-		try{
-			const sql = 'SELECT * FROM items;'
-			const data = await this.db.all(sql)
+		const sql = 'SELECT * FROM items;'
+		const data = await this.db.all(sql)
 
-			if(Object.keys(data).length === 0) throw new Error('no items exist')
-
-			const dataSize = Object.keys(data).length
-			for (let i = 0; i < dataSize; i++) {
-				data[i].interest = await this.numberOfInterested(data[i].id)
-			}
-
-			return data
-		} catch(err) {
-			throw err
+		if(Object.keys(data).length === 0) {
+			//no items exist
+			return false
 		}
+
+		const dataSize = Object.keys(data).length
+		for (let i = 0; i < dataSize; i++) {
+			data[i].interest = await this.numberOfInterested(data[i].id)
+		}
+
+		return data
+
 	}
 
 	/**
 	 * Gets the interest level for a specified set od
-	 * @param {object} data 
+	 * @param {object} data
 	 * @returns specific items with interest levels on each
 	 */
 	async givenItemsWithInterest(data) {
-		try{
 
-			if(Object.keys(data).length === 0) throw new Error('no items exist')
-
-			const dataSize = Object.keys(data).length
-			for (let i = 0; i < dataSize; i++) {
-				data[i].interest = await this.numberOfInterested(data[i].id)
-			}
-
-			return data
-		} catch(err) {
-			throw err
+		const dataSize = Object.keys(data).length
+		for (let i = 0; i < dataSize; i++) {
+			data[i].interest = await this.numberOfInterested(data[i].id)
 		}
+
+		return data
 	}
 
 	/**
 	 * Global search for items of interest - checks the title, short and long descriptions
 	 * @name search
-	 * @param {string} querystring 
+	 * @param {string} querystring
 	 * @returns returns all items with the searched string
 	 */
 	async search(querystring) {
@@ -469,4 +467,114 @@ module.exports = class items {
 		}
 	}
 
+	/**
+	 * Updates the object where the user has given new details
+	 * @param {Object} itemData
+	 * @param {Object} body
+	 * @returns updated object
+	 */
+	async getItemsToUpdate(itemData, body) {
+
+		const title = body.title
+		const price = body.price
+		const shortDesc = body.shortDesc
+		const longDesc = body.longDesc
+
+
+		if(!(title === null || title.length === 0)) itemData[0].title = title
+		if(!(shortDesc === null || shortDesc.length === 0)) itemData[0].shortDesc = shortDesc
+		if(!(longDesc === null || longDesc.length === 0)) itemData[0].longDesc = longDesc
+		if(price) itemData[0].price = price
+
+
+		return itemData
+
+	}
+
+	/**
+	 * Updates details where users have inputted new details
+	 * @param {number} itemID
+	 * @param {ctx.request.body} body
+	 * @returns true upon successful update
+	 */
+	async updateItem(itemID, body) {
+		try {
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			const itemData = await this.getDetails(itemID)
+			const originalName = [{title: itemData[0].title}]
+
+			const newItemData = await this.getItemsToUpdate(itemData, body)
+
+			const sql = `UPDATE items SET 
+				price = ${newItemData[0].price}, title = "${newItemData[0].title}",
+				shortDesc = "${newItemData[0].shortDesc}", longDesc = "${newItemData[0].longDesc}" 
+				WHERE id = ${newItemData[0].id}`
+			await this.db.run(sql)
+
+			const images = await this.getImages(originalName)
+			const changeImages = images.length
+
+			for(let i = 1; i <= changeImages; i++) {
+				fs.renameSync(`public/items/${originalName[0].title}${i}_small.png`, `public/items/${newItemData[0].title}${i}_small.png`)
+				fs.renameSync(`public/items/${originalName[0].title}${i}_big.png`, `public/items/${newItemData[0].title}${i}_big.png`)
+			}
+
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	/**
+	 * Deletes an item from the database
+	 * @param {number} itemID
+	 * @returns true if item is successfully deleted
+	 */
+	async deleteItem(itemID) {
+		try{
+			if(itemID === null || itemID.length === 0) throw new Error('missing itemID')
+
+			//test if item exists
+			const itemData = await this.getDetails(itemID)
+
+			const sql = `DELETE FROM items WHERE id = ${itemID}`
+			await this.db.run(sql)
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
+
+	async uploadItemPics(picsPath, picsType, title) {
+		try{
+			if(!picsPath || picsPath === null) throw new Error('missing path')
+			if(!picsType || picsType === null) throw new Error('missing types')
+			if(!title || title.length === 0) throw new Error('missing title')
+
+			for(let i = 1; i <= maxImages; i++) {
+				// eslint-disable-next-line no-var
+				let path = picsPath[i-1]
+				let type = picsType[i-1]
+
+				if(String(type).match(/.(jpg|jpeg|png|gif)$/i)) {
+					await sharp(path)
+						.resize(300, 200)
+						.toFile(`public/items/${title}${i}_small.png`)
+						.catch(err => err)
+				} else{
+					break
+				}
+
+				await fs.copy(path, `/home/lewis/Documents/uni/lovettel/public/items/${title}${i}_big.png`)
+
+			}
+
+			return true
+		} catch(err) {
+			throw err
+		}
+	}
 }

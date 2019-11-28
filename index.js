@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable max-lines */
 /* eslint-disable no-var */
-/* eslint-disable max-len */
 
 //Routes File
 
@@ -15,6 +13,9 @@ const staticDir = require('koa-static')
 const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
+const sharp = require('sharp')
+const watermark = require('image-watermark')
+const pathReq = require('path')
 
 //const stat = require('koa-static')
 //const handlebars = require('koa-hbs-renderer')
@@ -65,11 +66,12 @@ router.get('/', async ctx => {
 router.get('/gallery', async ctx => {
 	try {
 		const item = await new Item(dbName)
-
 		const data = await item.allItemWithInterest()
 		const auth = ctx.session.authorised
+
 		if(ctx.query.msg) data.msg = ctx.query.msg
 
+		if(data === false) await ctx.render('galleryNoItem', {auth: auth})
 		await ctx.render('gallery', {data: data, auth: auth})
 
 	} catch(err) {
@@ -119,7 +121,6 @@ router.post('/register', koaBody, async ctx => {
 	try {
 		// extract the data from the request
 		const body = ctx.request.body
-		console.log(body)
 
 		const {path, type} = ctx.request.files.avatar
 
@@ -162,12 +163,12 @@ router.get('/login', async ctx => {
 router.post('/login', async ctx => {
 	try {
 		const body = ctx.request.body
-		console.log(body)
+
 		const user = await new User(dbName)
+
 		ctx.session.userID = await user.login(body.user, body.pass)
 		ctx.session.authorised = true
 
-		console.log(ctx.session.userID)
 
 		return await ctx.redirect('gallery')
 	} catch(err) {
@@ -197,7 +198,6 @@ router.get('/logout', async ctx => {
 router.get('/addItem', async ctx => {
 	if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
 	await ctx.render('addItem')
-	console.log(ctx.session.userID)
 })
 
 /**
@@ -207,21 +207,26 @@ router.get('/addItem', async ctx => {
  * @route {POST} /addItem
  */
 
+// eslint-disable-next-line max-lines-per-function
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
-		const body = ctx.request.body
 		const item = await new Item(dbName)
+		const body = ctx.request.body
+		const files = ctx.request.files
+		const picsPath = [files.pic1.path, files.pic2.path, files.pic3.path]
+		const picsType = [files.pic1.type, files.pic2.type, files.pic3.type]
 
-		var {path, type} = ctx.request.files.pic1
-		await fs.copy(path, `public/items/${body.title}1.png`)
+		await item.uploadItemPics(picsPath, picsType, body.title)
 
-		var {path, type} = ctx.request.files.pic2
-		await fs.copy(path, `public/items/${body.title}2.png`)
+		let imagePath = pathReq.resolve(__dirname, `public/items/${body.title}1_big.png`)
+		if(fs.existsSync(imagePath)) await watermark.embedWatermark(imagePath, {'text': 'property of LEWIS LOVETTE','dstPath': `public/items/${body.title}1_big.png`})
 
-		var {path, type} = ctx.request.files.pic3
-		await fs.copy(path, `public/items/${body.title}3.png`)
+		imagePath = pathReq.resolve(__dirname, `public/items/${body.title}2_big.png`)
+		if(fs.existsSync(imagePath)) await watermark.embedWatermark(imagePath, {'text': 'property of LEWIS LOVETTE','dstPath': `public/items/${body.title}2_big.png`})
 
+		imagePath = pathReq.resolve(__dirname, `public/items/${body.title}3_big.png`)
+		if(fs.existsSync(imagePath)) await watermark.embedWatermark(imagePath, {'text': 'property of LEWIS LOVETTE','dstPath': `public/items/${body.title}3_big.png`})
 
 		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
@@ -256,7 +261,12 @@ router.get('/items/:index', async ctx => {
 
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
-		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested})
+
+		const edit = itemData[0].userID === ctx.session.userID
+		let deleteItem = false
+		if(edit && await item.isSold(itemData[0].id)) deleteItem = true
+
+		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested, edit: edit, deleteItem: deleteItem})
 
 	} catch(err) {
 		await ctx.render('error', {message: err.message})
@@ -357,6 +367,82 @@ router.post('/items/:index/paypal', koaBody, async ctx => {
 })
 
 /**
+ * Page to edit items.
+ *
+ * @name Edit Items Page
+ * @route {GET} /items/:index/edit
+ * @authentication This route requires cookie-based authentication.
+ */
+router.get('/items/:index/edit', async ctx => {
+	try{
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		await ctx.render('edit', {itemID: ctx.params.index})
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+/**
+ * The script to update item details.
+ *
+ * @name Edit Script
+ * @route {POST} /items/:index/edit
+ */
+router.post('/items/:index/edit', koaBody, async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+		const body = ctx.request.body
+
+		const item = await new Item(dbName)
+		await item.updateItem(ctx.params.index, body)
+
+		await ctx.redirect(`/items/${ctx.params.index}`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+
+/**
+ * Page to delete items.
+ *
+ * @name delete Items Page
+ * @route {GET} /items/:index/delete
+ * @authentication This route requires cookie-based authentication.
+ */
+router.get('/items/:index/delete', async ctx => {
+	try{
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+
+		await ctx.render('delete', {itemID: ctx.params.index})
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+/**
+ * The script to delete an item.
+ *
+ * @name delete Script
+ * @route {POST} /items/:index/delete
+ */
+router.post('/items/:index/delete', koaBody, async ctx => {
+	try {
+		if(ctx.session.authorised !== true) return ctx.redirect('/login?msg=you need to log in')
+
+		const item = await new Item(dbName)
+		await item.deleteItem(ctx.params.index)
+
+		await ctx.redirect(`/gallery?msg=item ${ctx.params.index} deleted`)
+	} catch(err) {
+		await ctx.render('error', {message: err.message})
+	}
+})
+
+
+/**
  * The page to display user information.
  *
  * @name User Page
@@ -374,6 +460,8 @@ router.get('/user/:index', async ctx => {
 		const userItem = await item.getUsersItems(ctx.params.index)
 
 		const userNumberInterest = await item.userNumberInterest(ctx.params.index)
+		
+		if(userItem === false) await ctx.render('user', {user: userData, userNumberInterest: userNumberInterest})
 
 		await ctx.render('user', {user: userData, item: userItem, userNumberInterest: userNumberInterest})
 

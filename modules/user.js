@@ -48,15 +48,6 @@ module.exports = class User {
 		}
 	}
 
-	/*
-	async uploadPicture(path, mimeType) {
-		const extension = mime.extension(mimeType)
-		console.log(`path: ${path}`)
-		console.log(`extension: ${extension}`)
-		await fs.copy(path, `public/avatars/${username}.${fileExtension}`)
-	}
-	*/
-
 	/**
 	 * Authenticates user details, signs them in if valid
 	 * @name login

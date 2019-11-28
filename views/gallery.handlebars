@@ -24,7 +24,7 @@
 
 		<form action="/gallery" method="post">
 			<p>Search for item titles, long and short descriptions:<br /><input type="text" name="search" placeholder="search for title, long and short desc" value=""></p>
-			<p><input type="submit" value="Search"></p>
+			<p><input type="submit" value="search"></p>
 		</form>
 		
 		<!--if authorised user, let them click on items-->
@@ -32,7 +32,7 @@
 			{{#each data}}
 				<a href="/items/{{this.id}}">
 					<div class="gallery" >
-						<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
+						<img src='../items/{{this.title}}1_small.png' alt="Cinque Terre" width="300" height="200">
 						<div class="title">{{this.title}}</div>
 						<div class="interest">Users watching: {{this.interest}}</div>
 						<div class="price" style="float:left">Price: £{{this.price}}</div>
@@ -46,7 +46,7 @@
 		{{#unless auth}}
 			{{#each data}}
 				<div class="gallery" >
-					<img src='../items/{{this.title}}1.png' alt="Cinque Terre" width="300" height="200">
+					<img src='../items/{{this.title}}1_small.png' alt="Cinque Terre" width="300" height="200">
 					<div class="title">{{this.title}}</div>
 					<div class="interest">Interested users: {{this.interest}}</div>
 					<div class="price" style="float:left">Price: £{{this.price}}</div>
