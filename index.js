@@ -212,11 +212,14 @@ router.post('/addItem', koaBody, async ctx => {
 		// extract the data from the request
 		const item = await new Item(dbName)
 		const body = ctx.request.body
-		const title = ctx.request.body.title
+		const files = ctx.request.files
+		const picsPath = [files.pic1.path, files.pic2.path, files.pic3.path]
+		const picsType = [files.pic1.type, files.pic2.type, files.pic3.type]
 
-		await item.uploadItemPics(ctx.request.files, title)
 
-		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
+		await item.uploadItemPics(picsPath, picsType, body.title)
+
+		//await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
 		await ctx.redirect('/gallery')
 	} catch(err) {

@@ -284,9 +284,7 @@ module.exports = class items {
 				\n Their offer: £${offer}`
 			}
 
-			transporter.sendMail(mailOptions, (error, info) => {
-				//doing stuff
-			})
+			transporter.sendMail(mailOptions, 1)
 
 			return true
 		} catch(err) {
@@ -319,9 +317,7 @@ module.exports = class items {
 				\n Buyer paid original item price of: £${item[0].price}`
 			}
 
-			transporter.sendMail(mailOptions, (error, info) => {
-				//doing stuff
-			})
+			transporter.sendMail(mailOptions, 1)
 
 			return true
 		} catch(err) {
@@ -554,13 +550,13 @@ module.exports = class items {
 		}
 	}
 
-	async uploadItemPics(files, title) {
-
-		const pics = [files.pic1, files.pic2, files.pic3]
+	async uploadItemPics(picsPath, picsType, title) {
 
 		for(let i = 1; i <= maxImages; i++) {
 			// eslint-disable-next-line no-var
-			var {path, type} = pics[i-1]
+			let path = picsPath[i-1]
+			let type = picsType[i-1]
+
 			if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
 				await sharp(path)
 					.resize(300, 200)
@@ -577,7 +573,7 @@ module.exports = class items {
 				await watermark.embedWatermark(imagePath,
 					{'text': 'property of LEWIS LOVETTE'
 						,'dstPath': `public/items/${title}${i}_big.png`})
-			} 
+			}
 		}
 
 		return true

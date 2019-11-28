@@ -110,7 +110,6 @@ describe('add item', () => {
 describe('getImages()', () => {
 
 	beforeEach(() => {
-		console.log('')
 		mock({
 			public: {
 				item: {
@@ -170,7 +169,7 @@ describe('getImages()', () => {
 		done()
 	})
 })
-/*
+
 describe('uploadItemPics()', () => {
 
 	beforeEach(() => {
@@ -192,14 +191,15 @@ describe('uploadItemPics()', () => {
 		expect.assertions(1)
 		//setup of item
 		const newItem = await new Item()
-		const pic1 = {File: { path: 'public/items/pictureUpload1.png', type: 'image/jpeg' }}
-		console.log(pic1)
-		const result = await newItem.uploadItemPics(pic1, 'testpic')
+		const files = {pic1: {File: { path: 'public/items/pictureUpload1.png', type: 'image/jpeg' }}}
+		console.log(files)
+		const result = await newItem.uploadItemPics(files, 'testpic')
 
 		expect(result[0]).toBe('pictureUpload1')
 		done()
 	})
-	
+
+	/*
 	test('appropriate setup testing image 2', async done => {
 		expect.assertions(1)
 		//setup of item
@@ -233,9 +233,9 @@ describe('uploadItemPics()', () => {
 			.rejects.toEqual( Error('item does not exist') )
 		done()
 	})
-
+	*/
 })
-*/
+
 
 describe('markAsSold()', () => {
 	test('buyer/seller succesfully saved to db', async done => {
@@ -1177,12 +1177,80 @@ describe('getItemsToUpdate()', () => {
 		expect(result[0].title).toBe('new')
 		done()
 	})
+//
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: null, price: 1, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].title).toBe('monalisa2')
+		done()
+	})
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: null, shortDesc: 'new new', longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].price).toBe(2000)
+		done()
+	})
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: 1, shortDesc: null, longDesc: 'new new new'}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].shortDesc).toBe('2nice')
+		done()
+	})
+	test('succesful update with multiple items', async done => {
+		expect.assertions(1)
+
+		//setup of item
+		const newItem = await new Item()
+		await newItem.addItem(1, 'monalisa', 1000, 'nice', 'very nice')
+		await newItem.addItem(1, 'monalisa2', 2000, '2nice', '2very nice')
+
+		const body = {title: 'new', price: 1, shortDesc: 'new new', longDesc: null}
+
+		const itemData = await newItem.getDetails(2)
+
+		const result = await newItem.getItemsToUpdate(itemData, body)
+
+		expect(result[0].longDesc).toBe('2very nice')
+		done()
+	})
 })
 
 
 describe('updateItem()', () => {
 	beforeEach(() => {
-		console.log('')
 		mock({
 			public: {
 				item: {
