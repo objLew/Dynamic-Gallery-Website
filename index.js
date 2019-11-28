@@ -14,13 +14,8 @@ const bodyParser = require('koa-bodyparser')
 const koaBody = require('koa-body')({multipart: true, uploadDir: '.'})
 const session = require('koa-session')
 const sharp = require('sharp')
-
 const watermark = require('image-watermark')
-var imaginary = require('imaginary')
-var Jimp = require('jimp');
-var jimpWatermark = require('jimp-watermark');
-
-
+const pathReq = require('path')
 
 //const stat = require('koa-static')
 //const handlebars = require('koa-hbs-renderer')
@@ -76,7 +71,7 @@ router.get('/gallery', async ctx => {
 
 		if(ctx.query.msg) data.msg = ctx.query.msg
 
-		//if(data === false) await ctx.render('galleryNoItem', {auth: auth})
+		if(data === false) await ctx.render('galleryNoItem', {auth: auth})
 		await ctx.render('gallery', {data: data, auth: auth})
 
 	} catch(err) {
@@ -215,54 +210,11 @@ router.get('/addItem', async ctx => {
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
-		const body = ctx.request.body
 		const item = await new Item(dbName)
+		const body = ctx.request.body
+		const title = ctx.request.body.title
 
-		var {path, type} = ctx.request.files.pic1
-		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
-			console.log(`${path } 1`)
-			await sharp(path)
-			  .resize(300, 200)
-			  .toFile(`public/items/${body.title}1_small.png`)
-		}
-		await fs.copy(path, `public/items/${body.title}1_big.png`)
-		/*
-		if(fs.existsSync(`public/items/${body.title}1_big.png`)) {
-			watermark.embedWatermark(`public/items/${body.title}1_big.png`, {'text': 'sample watermark'})
-		}
-		*/
-
-		var {path, type} = ctx.request.files.pic2
-		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
-			console.log(`${path } 2`)
-			await sharp(path)
-  			  .resize(300, 200)
-			  .toFile(`public/items/${body.title}2_small.png`)
-		}
-		await fs.copy(path, `public/items/${body.title}2_big.png`)
-		/*
-		if(fs.existsSync(`public/items/${body.title}2_big.png`)) {
-			watermark.embedWatermark(`public/items/${body.title}2_big.png`, {'text': 'property of Lewis Lovette'}, (err) => {
-				if (!err) console.log('pass 2')
-			})
-		}
-		*/
-
-		var {path, type} = ctx.request.files.pic3
-		if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
-			console.log(`${path} 3`)
-			await sharp(path)
-				.resize(300, 200)
-				.toFile(`public/items/${body.title}3_small.png`)
-		}
-		await fs.copy(path, `public/items/${body.title}3_big.png`)
-		/*
-		if(fs.existsSync(`public/items/${body.title}3_big.png`)) {
-			watermark.embedWatermark(`public/items/${body.title}3_big.png`, {'text': 'property of Lewis Lovette'}, (err) => {
-				if (!err) console.log('pass 3')
-			})
-		}
-		*/
+		await item.uploadItemPics(ctx.request.files, title)
 
 		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 

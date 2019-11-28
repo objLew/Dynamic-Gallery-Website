@@ -170,6 +170,72 @@ describe('getImages()', () => {
 		done()
 	})
 })
+/*
+describe('uploadItemPics()', () => {
+
+	beforeEach(() => {
+		console.log('')
+		mock({
+			public: {
+				item: {
+
+				}
+			},
+			'public/items/pictureUpload1.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/pictureUpload2.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'public/items/pictureUpload3.png': Buffer.from([8, 6, 7, 5, 3, 0, 9])
+		})
+	})
+	afterEach(mock.restore)
+
+	test('appropriate setup testing image 1', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const pic1 = {File: { path: 'public/items/pictureUpload1.png', type: 'image/jpeg' }}
+		console.log(pic1)
+		const result = await newItem.uploadItemPics(pic1, 'testpic')
+
+		expect(result[0]).toBe('pictureUpload1')
+		done()
+	})
+	
+	test('appropriate setup testing image 2', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[1]).toBe('pictureUpload2')
+		done()
+	})
+
+	test('appropriate setup testing image 3', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const itemData = [{title: 'pictureUpload'}]
+
+		const result = await newItem.getImages(itemData)
+
+		expect(result[2]).toBe('pictureUpload3')
+		done()
+	})
+
+	test('non existent item', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+
+		await expect( newItem.getImages(null) )
+			.rejects.toEqual( Error('item does not exist') )
+		done()
+	})
+
+})
+*/
 
 describe('markAsSold()', () => {
 	test('buyer/seller succesfully saved to db', async done => {

@@ -8,7 +8,13 @@
 //const mime = require('mime-types')
 
 const maxImages = 3
+
+const sharp = require('sharp')
+const watermark = require('image-watermark')
+const pathReq = require('path')
+
 const fs = require('fs-extra')
+
 
 const sqlite = require('sqlite-async')
 const nodemailer = require('nodemailer')
@@ -279,10 +285,7 @@ module.exports = class items {
 			}
 
 			transporter.sendMail(mailOptions, (error, info) => {
-				if (error) {
-					return console.log(error)
-				}
-				console.log('Message sent: %s', info.messageId)
+				//doing stuff
 			})
 
 			return true
@@ -317,10 +320,7 @@ module.exports = class items {
 			}
 
 			transporter.sendMail(mailOptions, (error, info) => {
-				if (error) {
-					return console.log(error)
-				}
-				console.log('Message sent: %s', info.messageId)
+				//doing stuff
 			})
 
 			return true
@@ -554,5 +554,32 @@ module.exports = class items {
 		}
 	}
 
+	async uploadItemPics(files, title) {
 
+		const pics = [files.pic1, files.pic2, files.pic3]
+
+		for(let i = 1; i <= maxImages; i++) {
+			// eslint-disable-next-line no-var
+			var {path, type} = pics[i-1]
+			if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
+				await sharp(path)
+					.resize(300, 200)
+					.toFile(`public/items/${title}${i}_small.png`)
+
+			} else{
+				break
+			}
+
+			await fs.copy(path, `/home/lewis/Documents/uni/lovettel/modules/public/items/${title}${i}_big.png`)
+
+			const imagePath = pathReq.resolve(__dirname, `public/items/${title}${i}_big.png`)
+			if(fs.existsSync(imagePath)) {
+				await watermark.embedWatermark(imagePath,
+					{'text': 'property of LEWIS LOVETTE'
+						,'dstPath': `public/items/${title}${i}_big.png`})
+			} 
+		}
+
+		return true
+	}
 }
