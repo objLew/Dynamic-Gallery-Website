@@ -551,31 +551,32 @@ module.exports = class items {
 	}
 
 	async uploadItemPics(picsPath, picsType, title) {
+		try{
+			if(!picsPath || picsPath === null) throw new Error('missing path')
+			if(!picsType || picsType === null) throw new Error('missing types')
+			if(!title || title.length === 0) throw new Error('missing title')
 
-		for(let i = 1; i <= maxImages; i++) {
-			// eslint-disable-next-line no-var
-			let path = picsPath[i-1]
-			let type = picsType[i-1]
+			for(let i = 1; i <= maxImages; i++) {
+				// eslint-disable-next-line no-var
+				let path = picsPath[i-1]
+				let type = picsType[i-1]
 
-			if(type.match(/.(jpg|jpeg|png|gif)$/i)) {
-				await sharp(path)
-					.resize(300, 200)
-					.toFile(`public/items/${title}${i}_small.png`)
+				if(String(type).match(/.(jpg|jpeg|png|gif)$/i)) {
+					await sharp(path)
+						.resize(300, 200)
+						.toFile(`public/items/${title}${i}_small.png`)
+						.catch(err => err)
+				} else{
+					break
+				}
 
-			} else{
-				break
+				await fs.copy(path, `/home/lewis/Documents/uni/lovettel/public/items/${title}${i}_big.png`)
+
 			}
 
-			await fs.copy(path, `/home/lewis/Documents/uni/lovettel/modules/public/items/${title}${i}_big.png`)
-
-			const imagePath = pathReq.resolve(__dirname, `public/items/${title}${i}_big.png`)
-			if(fs.existsSync(imagePath)) {
-				await watermark.embedWatermark(imagePath,
-					{'text': 'property of LEWIS LOVETTE'
-						,'dstPath': `public/items/${title}${i}_big.png`})
-			}
+			return true
+		} catch(err) {
+			throw err
 		}
-
-		return true
 	}
 }

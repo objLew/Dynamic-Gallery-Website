@@ -180,9 +180,9 @@ describe('uploadItemPics()', () => {
 
 				}
 			},
-			'public/items/pictureUpload1.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
-			'public/items/pictureUpload2.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
-			'public/items/pictureUpload3.png': Buffer.from([8, 6, 7, 5, 3, 0, 9])
+			'/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'/home/lewis/Documents/uni/lovettel/public/items/pictureUpload2.png': Buffer.from([8, 6, 7, 5, 3, 0, 9]),
+			'/home/lewis/Documents/uni/lovettel/public/items/pictureUpload3.png': Buffer.from([8, 6, 7, 5, 3, 0, 9])
 		})
 	})
 	afterEach(mock.restore)
@@ -191,13 +191,51 @@ describe('uploadItemPics()', () => {
 		expect.assertions(1)
 		//setup of item
 		const newItem = await new Item()
-		const files = {pic1: {File: { path: 'public/items/pictureUpload1.png', type: 'image/jpeg' }}}
-		console.log(files)
-		const result = await newItem.uploadItemPics(files, 'testpic')
+		const path = ['/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png']
+		const type = ['image/png']
 
-		expect(result[0]).toBe('pictureUpload1')
+		const result = await newItem.uploadItemPics(path, type, 'testpic')
+
+		expect(result).toBe(true)
 		done()
 	})
+
+	test('missing path', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const type = ['image/png']
+
+		await expect( newItem.uploadItemPics(null, type, 'testpath' ) )
+			.rejects.toEqual( Error('missing path') )
+		done()
+	})
+
+	test('missing type', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const path = ['/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png']
+		const type = ['image/png']
+
+		await expect( newItem.uploadItemPics(path, null, 'testpath' ) )
+			.rejects.toEqual( Error('missing types') )
+		done()
+	})
+
+	test('missing title', async done => {
+		expect.assertions(1)
+		//setup of item
+		const newItem = await new Item()
+		const path = ['/home/lewis/Documents/uni/lovettel/public/items/pictureUpload1.png']
+
+		const type = ['image/png']
+
+		await expect( newItem.uploadItemPics(path, type, null ) )
+			.rejects.toEqual( Error('missing title') )
+		done()
+	})
+
 
 	/*
 	test('appropriate setup testing image 2', async done => {

@@ -207,6 +207,7 @@ router.get('/addItem', async ctx => {
  * @route {POST} /addItem
  */
 
+// eslint-disable-next-line max-lines-per-function
 router.post('/addItem', koaBody, async ctx => {
 	try {
 		// extract the data from the request
@@ -216,10 +217,19 @@ router.post('/addItem', koaBody, async ctx => {
 		const picsPath = [files.pic1.path, files.pic2.path, files.pic3.path]
 		const picsType = [files.pic1.type, files.pic2.type, files.pic3.type]
 
-
 		await item.uploadItemPics(picsPath, picsType, body.title)
 
-		//await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
+		let imagePath = pathReq.resolve(__dirname, `public/items/${body.title}1_big.png`)
+		console.log(imagePath)
+		if(fs.existsSync(imagePath)) await watermark.embedWatermark(imagePath, {'text': 'property of LEWIS LOVETTE','dstPath': `public/items/${body.title}1_big.png`})
+
+		imagePath = pathReq.resolve(__dirname, `public/items/${body.title}2_big.png`)
+		if(fs.existsSync(imagePath)) await watermark.embedWatermark(imagePath, {'text': 'property of LEWIS LOVETTE','dstPath': `public/items/${body.title}2_big.png`})
+
+		imagePath = pathReq.resolve(__dirname, `public/items/${body.title}3_big.png`)
+		if(fs.existsSync(imagePath)) await watermark.embedWatermark(imagePath, {'text': 'property of LEWIS LOVETTE','dstPath': `public/items/${body.title}3_big.png`})
+
+		await item.addItem(ctx.session.userID, body.title, body.price, body.shortDesc, body.longDesc)
 
 		await ctx.redirect('/gallery')
 	} catch(err) {
@@ -253,14 +263,9 @@ router.get('/items/:index', async ctx => {
 		const interested = await item.isInterested(ctx.params.index, ctx.session.userID)
 		const numberOfInterested = await item.numberOfInterested(ctx.params.index)
 
-		let edit = false
+		const edit = itemData[0].userID === ctx.session.userID
 		let deleteItem = false
-		if(itemData[0].userID === ctx.session.userID) {
-			edit = true
-			if(await item.isSold(itemData[0].id)) {
-				deleteItem = true
-			}
-		}
+		if(edit && await item.isSold(itemData[0].id)) deleteItem = true
 
 		await ctx.render('items', {image: images, item: itemData, user: userData, interested: interested, numberOfInterested: numberOfInterested, edit: edit, deleteItem: deleteItem})
 
