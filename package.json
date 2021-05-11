@@ -28,7 +28,7 @@
     "bcryptjs": "^2.4.3",
     "dynamic-watermark": "^1.0.0",
     "fs-extra": "^7.0.1",
-    "handlebars": "^4.5.3",
+    "handlebars": "^4.7.7",
     "image-watermark": "0.0.7",
     "imagemagick": "^0.1.3",
     "imaginary": "^0.1.16",
