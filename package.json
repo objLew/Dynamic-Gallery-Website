@@ -45,7 +45,7 @@
     "markdown": "^0.5.0",
     "markdownlint-cli": "^0.18.0",
     "mime-types": "^2.1.22",
-    "nodemailer": "^6.3.1",
+    "nodemailer": "^6.4.16",
     "nodemon": "^1.19.4",
     "puppeteer": "^2.0.0",
     "puppeteer-har": "^1.1.1",
